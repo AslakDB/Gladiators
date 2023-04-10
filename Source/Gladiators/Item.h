@@ -27,5 +27,12 @@ public:
 		UStaticMeshComponent* Mesh;
 
 	UPROPERTY(VisibleAnywhere)
-		UWidgetComponent* ItemWidget;
+		class UWidgetComponent* ItemWidget;
+
+	UPROPERTY(EditAnywhere)
+		class ACharacter* Character;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ACharacter> TCharacter;
+
+
 };

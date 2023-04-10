@@ -3,6 +3,7 @@
 
 #include "Item.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/Character.h"
 
 // Sets default values
 AItem::AItem()
@@ -16,13 +17,24 @@ AItem::AItem()
 
 	ItemWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("ItemWidget"));
 	ItemWidget->SetupAttachment(GetRootComponent());
+
+	
 }
 
 // Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	if (ItemWidget)
+	{
+		GEngine->AddOnScreenDebugMessage(2, 60.f, FColor::Green, FString("invisable"));
+		ItemWidget->SetVisibility(false);
+		GEngine->AddOnScreenDebugMessage(3, 60.f, FColor::Red, FString("invisable"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(4, 60.f, FColor::Cyan, FString("ItemWidget Null error"));
+	}
 }
 
 // Called every frame
@@ -30,5 +42,34 @@ void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FVector CurrentLocation = GetActorLocation();
+
+	if(GetWorld())
+	{
+		if (Character)
+		{
+			//FVector CurrentLocation = GetActorLocation();
+			FVector CharacterLocation = Character->GetActorLocation();
+
+			float Distance = FVector::Distance(CurrentLocation, CharacterLocation);
+
+			bool close = true;
+			if(Distance < 200)
+			{
+				ItemWidget->SetVisibility(true);
+				GEngine->AddOnScreenDebugMessage(4, 60.f, FColor::Cyan, FString("Bool is true"));
+			}
+			else
+			{
+				ItemWidget->SetVisibility(false);
+				GEngine->AddOnScreenDebugMessage(4, 60.f, FColor::Cyan, FString("Bool is false"));
+			}
+
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(5, 60.f, FColor::Blue, FString("Character does not exist"));
+		}
+	}
 }
 
