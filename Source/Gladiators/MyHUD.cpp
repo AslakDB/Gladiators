@@ -5,7 +5,7 @@
 #include "EnhancedInput/Public/InputMappingContext.h"
 #include "EnhancedInput/Public/EnhancedInputSubsystems.h"
 
-void AMyHUD::GetPlayerHealth()
+void AMyHUD::GetPlayerHealth(float Health, float MaxHealth)
 {
 	
 }

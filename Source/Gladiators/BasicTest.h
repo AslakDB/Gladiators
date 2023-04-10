@@ -15,6 +15,13 @@ public:
 	// Sets default values for this character's properties
 	ABasicTest();
 
+
+	UPROPERTY(BlueprintReadWrite)
+		float Health;
+
+	UPROPERTY(BlueprintReadWrite)
+		float MaxHealth;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -25,5 +32,10 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(VisibleAnywhere)
+		class UPlayerUserWidget* Widget = nullptr;
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UPlayerUserWidget> TWidget;
 
 };

@@ -13,7 +13,7 @@ UCLASS()
 class GLADIATORS_API UPlayerUserWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
+public:
 		UFUNCTION(BlueprintCallable, Category = "HUD")
 		void SetPlayerHealth(float CurrentHealth, float MaxHealth);
 

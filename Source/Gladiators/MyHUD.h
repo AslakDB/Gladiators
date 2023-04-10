@@ -17,7 +17,7 @@ class GLADIATORS_API AMyHUD : public AHUD
 public:
 		/*Get the player health to cast to Hud */
 		UFUNCTION(BlueprintCallable, Category = "HUD")
-		void GetPlayerHealth();
+		void GetPlayerHealth(float Health, float MaxHealth);
 
 
 	/*Get the score to cast to HUD*/
@@ -27,4 +27,6 @@ public:
 	/*Gets the UI descriptions for items to the HUD */
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 		void GetItemDescription();
+
+	
 };
