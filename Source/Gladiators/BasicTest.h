@@ -38,4 +38,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UPlayerUserWidget> TWidget;
 
+	UPROPERTY(VisibleAnywhere)
+	class UBossWidget* BossWidget;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UBossWidget> TBossWidget;
+
+	UFUNCTION(BlueprintCallable)
+		void TestFunction();
+
 };

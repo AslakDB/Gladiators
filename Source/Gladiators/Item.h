@@ -27,7 +27,7 @@ public:
 		UStaticMeshComponent* Mesh;
 
 	UPROPERTY(VisibleAnywhere)
-		class UWidgetComponent* ItemWidget;
+		class UWidgetComponent* ItemWidget = nullptr;
 
 	UPROPERTY(EditAnywhere)
 		class ACharacter* Character;

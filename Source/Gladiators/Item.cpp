@@ -52,17 +52,16 @@ void AItem::Tick(float DeltaTime)
 			FVector CharacterLocation = Character->GetActorLocation();
 
 			float Distance = FVector::Distance(CurrentLocation, CharacterLocation);
-
-			bool close = true;
-			if(Distance < 200)
+;
+			if(Distance < 2000)
 			{
 				ItemWidget->SetVisibility(true);
-				GEngine->AddOnScreenDebugMessage(4, 60.f, FColor::Cyan, FString("Bool is true"));
+				GEngine->AddOnScreenDebugMessage(4, 60.f, FColor::Blue, FString("Bool is true"));
 			}
 			else
 			{
 				ItemWidget->SetVisibility(false);
-				GEngine->AddOnScreenDebugMessage(4, 60.f, FColor::Cyan, FString("Bool is false"));
+				GEngine->AddOnScreenDebugMessage(4, 60.f, FColor::Red, FString("Bool is false"));
 			}
 
 		}
