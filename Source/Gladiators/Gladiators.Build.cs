@@ -9,10 +9,14 @@ public class Gladiators : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
 <<<<<<< HEAD
+<<<<<<< HEAD
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "EnhancedInput", "AIModule" });
 =======
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG","EnhancedInput" });
 >>>>>>> Player
+=======
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" ,"EnhancedInput", "UMG"});
+>>>>>>> parent of 9689df0 (Merge remote-tracking branch 'origin/AI' into AslakBranch)
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
