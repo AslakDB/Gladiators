@@ -11,6 +11,9 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
+#include "PlayerUserWidget.h"
+#include "Blueprint/UserWidget.h"
+
 // Sets default values
 AMySweetBabyBoi::AMySweetBabyBoi()
 {
@@ -38,7 +41,19 @@ void AMySweetBabyBoi::BeginPlay()
 	Super::BeginPlay();
 
 	GetCharacterMovement()->MaxWalkSpeed = 330.f;
-
+	if (UWorld* World = GetWorld())
+	{
+		Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
+		if (Widget)
+		{
+			Widget->AddToViewport(999);
+			GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, FString("No Nullpt"));
+		}
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, FString("Nullpt error"));
+		}
+	}
 	// Add the mapping context
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
@@ -50,6 +65,8 @@ void AMySweetBabyBoi::BeginPlay()
 
 		}
 	}
+
+	
 	
 }
 

@@ -82,4 +82,10 @@ private:
 	float Yaw;
 	float Pitch;
 
+
+public:
+	UPROPERTY(VisibleAnywhere)
+		class UPlayerUserWidget* Widget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UPlayerUserWidget> TWidget;
 };
