@@ -40,6 +40,8 @@ void AMySweetBabyBoi::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Tags.Add(FName("EngagableTarget"));
+
 	GetCharacterMovement()->MaxWalkSpeed = 330.f;
 	if (UWorld* World = GetWorld())
 	{
