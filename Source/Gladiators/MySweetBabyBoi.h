@@ -7,6 +7,8 @@
 #include "MySweetBabyBoi.generated.h"
 
 struct FInputActionValue;
+class UItems;
+
 
 UCLASS()
 class GLADIATORS_API AMySweetBabyBoi : public ACharacter
@@ -24,6 +26,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
 		class UCameraComponent* Camera{ nullptr };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
+		class USphereComponent* ColliderPickup;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,7 +59,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
 		class UInputAction* DodgeInput;
 
-	UFUNCTION()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
+		class UInputAction* UseInput;
+	
+
 		bool GetIsAttack();
 
 	UFUNCTION()
@@ -68,6 +75,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "BabyVariables | Animation")
 		float InputY;
 
+	/*UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
+		TArray<AWeapons*> Weapons;*/
+
 private:
 	void Forward(const FInputActionValue& input);
 	void Right(const FInputActionValue& input);
@@ -75,7 +85,9 @@ private:
 	void MouseY(const FInputActionValue& input);
 	void Attack(const FInputActionValue& input);
 	void Dodge(const FInputActionValue& input);
+	void Use(const FInputActionValue& input);
 	void Movement();
+	void PickupStuff();
 
 
 	bool IsAttack;

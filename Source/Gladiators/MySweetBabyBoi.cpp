@@ -96,6 +96,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::MouseY);
 		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseX);
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseY);
+		EnhanceInputCom->BindAction(UseInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Use);
 	}
 }
 
@@ -123,6 +124,12 @@ void AMySweetBabyBoi::Movement()
 		AddMovementInput(RightVector);
 	}
 }
+
+void AMySweetBabyBoi::PickupStuff()
+{
+}
+
+
 
 bool AMySweetBabyBoi::GetIsAttack()
 {
@@ -160,6 +167,10 @@ void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 }
 
 void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
+{
+}
+
+void AMySweetBabyBoi::Use(const FInputActionValue& input)
 {
 }
 
