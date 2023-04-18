@@ -81,7 +81,10 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	
+	if (InventoryWidget)
+	{
+		InventoryWidget->Inven
+	}
 
 	if (GetCharacterMovement()->IsFalling())
 	{

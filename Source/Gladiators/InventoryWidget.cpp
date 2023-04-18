@@ -4,10 +4,7 @@
 #include "InventoryWidget.h"
 #include "Components/Image.h"
 
-void UInventoryWidget::BeginPlay()
-{
-	Super::BeginPlay();
-}
+
 
 void UInventoryWidget::AddToInventory()
 {

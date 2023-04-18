@@ -15,7 +15,7 @@ class GLADIATORS_API UInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-		virtual void BeginPlay() override;
+public:
 
 		UPROPERTY(VisibleAnywhere)
 		int InventoryCount;
