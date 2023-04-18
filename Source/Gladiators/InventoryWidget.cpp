@@ -2,6 +2,12 @@
 
 
 #include "InventoryWidget.h"
+#include "Components/Image.h"
+
+void UInventoryWidget::BeginPlay()
+{
+	Super::BeginPlay();
+}
 
 void UInventoryWidget::AddToInventory()
 {
@@ -13,11 +19,13 @@ void UInventoryWidget::RemoveFromInventory()
 	InventoryCount--;
 }
 
+
+
 void UInventoryWidget::ManageInventory()
 {
 	if (InventoryCount == 0)
 	{
-		//Show 0 inventory slots
+		EmptyImage1->RemoveFromParent();
 	}
 	else if (InventoryCount == 1)
 	{
