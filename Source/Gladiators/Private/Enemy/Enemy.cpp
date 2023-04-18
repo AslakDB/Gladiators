@@ -28,8 +28,8 @@ AEnemy::AEnemy()
 	bUseControllerRotationRoll = false;
 
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
-	PawnSensing->SightRadius = 4000.f;
-	PawnSensing->SetPeripheralVisionAngle(45.f);
+	PawnSensing->SightRadius = 15000.f;
+	PawnSensing->SetPeripheralVisionAngle(170.f);
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -101,7 +101,7 @@ void AEnemy::Die()
 	ClearAttackTimer();
 	HideHealthBar();
 	DisableCapsule();
-	SetLifeSpan(DeathLifeSpan);
+	//SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 }
