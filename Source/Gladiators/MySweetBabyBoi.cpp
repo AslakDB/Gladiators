@@ -49,16 +49,9 @@ void AMySweetBabyBoi::BeginPlay()
 		Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
 		if (Widget)
 		{
-			Widget->AddToViewport(99999);
-			GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, FString("No Nullpt"));
+			Widget->AddToViewport(2);
 		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, FString("Nullpt error"));
-		}
-
 		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
-		
 	}
 	// Add the mapping context
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
@@ -71,9 +64,6 @@ void AMySweetBabyBoi::BeginPlay()
 
 		}
 	}
-	
-	InventoryIsOpen = false;
-	
 }
 
 // Called every frame
@@ -81,10 +71,6 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (InventoryWidget)
-	{
-		InventoryWidget->Inven
-	}
 
 	if (GetCharacterMovement()->IsFalling())
 	{
@@ -95,17 +81,14 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 
-	// Pulled this out to its own function
+
 
 	Movement();
 
 	AddControllerYawInput(Yaw);
 	AddControllerPitchInput(Pitch);
 
-	/*if (InventoryWidget && InventoryIsOpen)
-	{InventoryWidget->AddToViewport(99);}
-	else if (InventoryWidget && !InventoryIsOpen)
-	{InventoryWidget->RemoveFromParent();}*/
+	
 }
 
 // Called to bind functionality to input
@@ -138,13 +121,13 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 void AMySweetBabyBoi::Movement()
 {
-	//Movement
+	
 	FRotator ControlRotation = Controller->GetControlRotation();
 
 	ControlRotation.Roll = 0.f;
 	ControlRotation.Pitch = 0.f;
 
-	//Getting the direction we're looking, and the right vector = cross product of forward and up vectors
+	
 	FVector ForwardVector = UKismetMathLibrary::GetForwardVector(ControlRotation);
 	FVector RightVector = UKismetMathLibrary::GetRightVector(ControlRotation);
 
@@ -205,15 +188,13 @@ void AMySweetBabyBoi::OpenInv(const FInputActionValue& input)
 	
 	if (InventoryWidget)
 	{
-		InventoryWidget->AddToViewport(99);
+		InventoryWidget->AddToViewport(1);
 	}
-	GEngine->AddOnScreenDebugMessage(100, 60.f, FColor::Cyan, FString("Ïnventory showing"));
-	//InventoryIsOpen = true;
+	
 }
 inline void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
 {
-	GEngine->AddOnScreenDebugMessage(34, 60.f, FColor::Cyan, FString("Inventory not showing"));
-	//InventoryIsOpen = false;
+	
 	if (InventoryWidget )
 	{
 		InventoryWidget->RemoveFromParent();
