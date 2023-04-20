@@ -8,6 +8,9 @@
 
 struct FInputActionValue;
 class UItems;
+class ASword;
+class ASpear;
+class AAxe;
 
 
 UCLASS()
@@ -75,8 +78,19 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "BabyVariables | Animation")
 		float InputY;
 
-	/*UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Inventory")
-		TArray<AWeapons*> Weapons;*/
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex,
+			bool bFromSweep, const FHitResult& SweepResult);
+
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<ASword*> NearbySword;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<ASpear*> NearbySpear;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<AAxe*> NearbyAxe;
 
 private:
 	void Forward(const FInputActionValue& input);
@@ -87,7 +101,9 @@ private:
 	void Dodge(const FInputActionValue& input);
 	void Use(const FInputActionValue& input);
 	void Movement();
-	void PickupStuff();
+	void PickupSword();
+	void PickupSpear();
+	void PickupAxe();
 
 
 	bool IsAttack;

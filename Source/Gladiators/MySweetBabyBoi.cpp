@@ -10,6 +10,10 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/SphereComponent.h"
+#include "Items/Weapons/Spear.h"
+#include "Items/Weapons/Sword.h"
+#include "Items/Weapons/Axe.h"
 
 // Sets default values
 AMySweetBabyBoi::AMySweetBabyBoi()
@@ -23,6 +27,13 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+
+	ColliderPickup = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
+	ColliderPickup->SetupAttachment(GetRootComponent());
+	ColliderPickup->bHiddenInGame = false;
+	ColliderPickup->InitSphereRadius(100.f);
+	ColliderPickup->OnComponentBeginOverlap.AddDynamic(this, &AMySweetBabyBoi::OnOverlapBegin);
+	ColliderPickup->OnComponentEndOverlap.AddDynamic(this, &AMySweetBabyBoi::OnOverlapEnd);
 
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
@@ -125,10 +136,28 @@ void AMySweetBabyBoi::Movement()
 	}
 }
 
-void AMySweetBabyBoi::PickupStuff()
+void AMySweetBabyBoi::PickupSword()
 {
+	ASword* ItemToDestroy = NearbySword[0];
+	NearbySword.RemoveAt(0);
+	ItemToDestroy->Pickup();
+
+	
 }
 
+void AMySweetBabyBoi::PickupSpear()
+{
+	ASpear* SpearToDestroy = NearbySpear[0];
+	NearbySpear.RemoveAt(0);
+	SpearToDestroy->Pickup();
+}
+
+void AMySweetBabyBoi::PickupAxe()
+{
+	AAxe* AxeToDestroy = NearbyAxe[0];
+	NearbyAxe.RemoveAt(0);
+	AxeToDestroy->Pickup();
+}
 
 
 bool AMySweetBabyBoi::GetIsAttack()
@@ -139,6 +168,38 @@ bool AMySweetBabyBoi::GetIsAttack()
 void AMySweetBabyBoi::ResetAttack()
 {
 	IsAttack = false;
+}
+
+void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA<ASword>())
+	{
+		NearbySword.Add(Cast<ASword>(OtherActor));
+	}
+	if (OtherActor->IsA<ASpear>())
+	{
+		NearbySpear.Add(Cast<ASpear>(OtherActor));
+	}
+	if (OtherActor->IsA<AAxe>())
+	{
+		NearbyAxe.Add(Cast<AAxe>(OtherActor));
+	}
+}
+
+void AMySweetBabyBoi::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
+{
+	if (OtherActor->IsA<ASword>())
+	{
+		NearbySword.Remove(Cast<ASword>(OtherActor));
+	}
+	if(OtherActor->IsA<ASpear>())
+	{
+		NearbySpear.Remove(Cast<ASpear>(OtherActor));
+	}
+	if(OtherActor->IsA<AAxe>())
+	{
+		NearbyAxe.Remove(Cast<AAxe>(OtherActor));
+	}
 }
 
 void AMySweetBabyBoi::Forward(const FInputActionValue& input)
@@ -172,6 +233,21 @@ void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
 
 void AMySweetBabyBoi::Use(const FInputActionValue& input)
 {
+	if (NearbySword.Num() > 0)
+	{
+		PickupSword();
+		return;
+	}
+	if (NearbySpear.Num() > 0)
+	{
+		PickupSpear();
+		return;
+	}
+	if (NearbyAxe.Num() > 0)
+	{
+		PickupAxe();
+		return;
+	}
 }
 
 
