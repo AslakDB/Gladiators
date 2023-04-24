@@ -34,6 +34,8 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+	
+
 }
 
 // Called when the game starts or when spawned
@@ -84,8 +86,14 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 
 	Movement();
+	if (Controller)
+	{
 
-	AddControllerYawInput(Yaw);
+
+		AddControllerYawInput(Yaw);
+	}
+
+
 	AddControllerPitchInput(Pitch);
 
 	
@@ -123,6 +131,8 @@ void AMySweetBabyBoi::Movement()
 {
 	
 	FRotator ControlRotation = Controller->GetControlRotation();
+	
+	
 
 	ControlRotation.Roll = 0.f;
 	ControlRotation.Pitch = 0.f;
