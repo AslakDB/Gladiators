@@ -101,8 +101,16 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 
 			Movement();
+			if (Controller)
+			{
 
-			AddControllerYawInput(Yaw);
+
+				AddControllerYawInput(Yaw);
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(1, 5, FColor::Blue, TEXT("Controller Is false"));
+			}
 			AddControllerPitchInput(Pitch);
 			PauseWidget->RemoveFromParent();
 		}
