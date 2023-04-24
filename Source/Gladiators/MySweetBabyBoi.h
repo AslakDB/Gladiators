@@ -61,7 +61,8 @@ public:
 		class UInputAction* OpenInventory;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputAction* CloseInventory;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* PauseGame;
 
 
 	UFUNCTION()
@@ -91,6 +92,7 @@ private:
 	/*Functions for open and close inventory*/
 	void OpenInv(const FInputActionValue& input);
 	void CloseInv(const FInputActionValue& input);
+	void PausedGame(const FInputActionValue& input);
 
 	bool IsAttack;
 	float Yaw;

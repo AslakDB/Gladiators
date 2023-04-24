@@ -14,6 +14,7 @@ class UButton;
 UCLASS()
 class GLADIATORS_API UPauseMenuWidget : public UUserWidget
 {
+public:
 	GENERATED_BODY()
 		UPROPERTY(VisibleAnywhere)
 		bool Paused;

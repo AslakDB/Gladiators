@@ -82,28 +82,37 @@ void AMySweetBabyBoi::BeginPlay()
 void AMySweetBabyBoi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
-	if (GetCharacterMovement()->IsFalling())
+	if (PauseWidget)
 	{
-		GetCharacterMovement()->bOrientRotationToMovement = false;
+		if (!PauseWidget->Paused)
+		{
+			if (GetCharacterMovement()->IsFalling())
+			{
+				GetCharacterMovement()->bOrientRotationToMovement = false;
+			}
+			else
+			{
+				GetCharacterMovement()->bOrientRotationToMovement = true;
+			}
+			if (InventoryWidget)
+			{
+				InventoryWidget->ManageInventory();
+			}
+
+
+			Movement();
+
+			AddControllerYawInput(Yaw);
+			AddControllerPitchInput(Pitch);
+			PauseWidget->RemoveFromParent();
+		}
+		else
+		{
+
+			PauseWidget->AddToViewport();
+			PauseWidget->PauseMenuManager();
+		}
 	}
-	else
-	{
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-	}
-	if (InventoryWidget)
-	{
-		InventoryWidget->ManageInventory();														
-	}
-
-
-	Movement();
-
-	AddControllerYawInput(Yaw);
-	AddControllerPitchInput(Pitch);
-
-	
 }
 
 // Called to bind functionality to input
@@ -131,6 +140,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::OpenInv);
 		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::CloseInv);
 		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);
+		EnhanceInputCom->BindAction(PauseGame, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::PausedGame);
 	}
 }
 
@@ -191,15 +201,7 @@ void AMySweetBabyBoi::MouseY(const FInputActionValue& input)
 
 void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 {
-	IsAttack = true;
-	if (InventoryWidget)
-	{
-		InventoryWidget->InventoryCount++;
-		if (InventoryWidget->InventoryCount > 3)
-		{
-			InventoryWidget->InventoryCount = 0;
-		}
-	}
+	
 }
 
 void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
@@ -221,6 +223,18 @@ inline void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
 	if (InventoryWidget )
 	{
 		InventoryWidget->RemoveFromParent();
+	}
+}
+
+void AMySweetBabyBoi::PausedGame(const FInputActionValue& input)
+{
+	if (PauseWidget)
+	{
+		if (!PauseWidget->Paused)
+		{
+			PauseWidget->Paused = true;
+		}
+		
 	}
 }
 
