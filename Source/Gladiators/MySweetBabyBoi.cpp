@@ -12,6 +12,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InventoryWidget.h"
 #include "Public/Hud/PauseMenuWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 #include "PlayerUserWidget.h"
 #include "Blueprint/UserWidget.h"
