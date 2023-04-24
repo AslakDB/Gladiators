@@ -11,6 +11,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InventoryWidget.h"
+#include "Public/Hud/PauseMenuWidget.h"
 
 #include "PlayerUserWidget.h"
 #include "Blueprint/UserWidget.h"
@@ -51,6 +52,13 @@ void AMySweetBabyBoi::BeginPlay()
 		{
 			Widget->AddToViewport(2);
 		}
+
+		PauseWidget = CreateWidget<UPauseMenuWidget>(World, TPauseWidget);
+		if (PauseWidget)
+		{
+			PauseWidget->AddToViewport(3);
+		}
+		
 		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
 	}
 	// Add the mapping context
@@ -63,6 +71,10 @@ void AMySweetBabyBoi::BeginPlay()
 			subsystem->AddMappingContext(MappingContext, 0);
 
 		}
+	}
+	if (InventoryWidget)
+	{
+		InventoryWidget->InventoryCount = 0;
 	}
 }
 
@@ -80,7 +92,10 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 	{
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
-
+	if (InventoryWidget)
+	{
+		InventoryWidget->ManageInventory();														
+	}
 
 
 	Movement();
@@ -177,6 +192,14 @@ void AMySweetBabyBoi::MouseY(const FInputActionValue& input)
 void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 {
 	IsAttack = true;
+	if (InventoryWidget)
+	{
+		InventoryWidget->InventoryCount++;
+		if (InventoryWidget->InventoryCount > 3)
+		{
+			InventoryWidget->InventoryCount = 0;
+		}
+	}
 }
 
 void AMySweetBabyBoi::Dodge(const FInputActionValue& input)

@@ -107,6 +107,11 @@ public:
 		class UInventoryWidget* InventoryWidget = nullptr;
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UInventoryWidget> TInventoryWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UPauseMenuWidget* PauseWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UPauseMenuWidget> TPauseWidget;
 };
 
 
