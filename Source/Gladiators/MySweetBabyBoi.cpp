@@ -11,6 +11,15 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Components/SphereComponent.h"
+
+#include "InventoryWidget.h"
+#include "Public/Hud/PauseMenuWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+
+#include "PlayerUserWidget.h"
+#include "Blueprint/UserWidget.h"
+
+
 #include "Items/Weapons/Spear.h"
 #include "Items/Weapons/Sword.h"
 #include "Items/Weapons/Axe.h"
@@ -63,31 +72,76 @@ void AMySweetBabyBoi::BeginPlay()
 
 		}
 	}
-	
+
+	if (UWorld* World = GetWorld())
+	{
+		Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
+		if (Widget)
+		{
+			Widget->AddToViewport(2);
+		}
+
+		PauseWidget = CreateWidget<UPauseMenuWidget>(World, TPauseWidget);
+		if (PauseWidget)
+		{
+			PauseWidget->AddToViewport(3);
+		}
+
+		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
+	}
+
+	if (InventoryWidget)
+	{
+		InventoryWidget->InventoryCount = 0;
+	}
+
+
 }
 
 // Called every frame
 void AMySweetBabyBoi::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
-	if (GetCharacterMovement()->IsFalling())
+	if (PauseWidget)
 	{
-		GetCharacterMovement()->bOrientRotationToMovement = false;
+		if (!PauseWidget->Paused)
+		{
+			Super::Tick(DeltaTime);
+
+			if (GetCharacterMovement()->IsFalling())
+			{
+				GetCharacterMovement()->bOrientRotationToMovement = false;
+			}
+			else
+			{
+				GetCharacterMovement()->bOrientRotationToMovement = true;
+			}
+
+			// Pulled this out to its own function
+
+			Movement();
+
+			AddControllerYawInput(Yaw);
+			AddControllerPitchInput(Pitch);
+
+			PauseWidget->RemoveFromParent();
+			APlayerController* PlayerController = Cast<APlayerController>(Controller);
+			PlayerController->SetShowMouseCursor(false);
+			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
+		}
+		
+		else
+		{
+			PauseWidget->AddToViewport();
+			PauseWidget->PauseMenuManager();
+			APlayerController* PlayerController = Cast<APlayerController>(Controller);
+			PlayerController->SetShowMouseCursor(true);
+			UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerController, PauseWidget);
+		
+		}
 	}
-	else
-	{
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-	}
-
-	// Pulled this out to its own function
-
-	Movement();
-
-	AddControllerYawInput(Yaw);
-	AddControllerPitchInput(Pitch);
-
 }
+
+
 
 // Called to bind functionality to input
 void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -110,6 +164,13 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseX);
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseY);
 		EnhanceInputCom->BindAction(UseInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Use);
+		/*Code for input on open and close inventory*/
+		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::OpenInv);
+		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::OpenInv);
+		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::CloseInv);
+		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);
+		EnhanceInputCom->BindAction(PauseGame, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::PausedGame);
+
 	}
 }
 
@@ -189,7 +250,7 @@ void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 }
 
 void AMySweetBabyBoi::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
-{
+{	
 	if (OtherActor->IsA<ASword>())
 	{
 		NearbySword.Remove(Cast<ASword>(OtherActor));
@@ -251,5 +312,35 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 		return;
 	}
 }
+
+void AMySweetBabyBoi::OpenInv(const FInputActionValue& input)
+{
+	if (InventoryWidget)
+	{
+		InventoryWidget->AddToViewport(1);
+	}
+}
+
+void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
+{
+	if (InventoryWidget)
+	{
+		InventoryWidget->RemoveFromParent();
+	}
+}
+
+	void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
+	{
+		if (PauseWidget)
+		{
+			if (!PauseWidget->Paused)
+			{
+				PauseWidget->Paused = true;
+			}
+
+		}
+	}
+
+
 
 
