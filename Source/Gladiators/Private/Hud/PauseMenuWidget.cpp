@@ -12,10 +12,11 @@ void UPauseMenuWidget::PauseMenuManager()
 {
 	if (Resume->IsPressed())
 	{
-		if (Manager)
-		{
-			Manager->Paused = false;
-		}
+		
+		
+			Paused = false;
+		
+		
 	}
 	if (Quit->IsPressed())
 	{
