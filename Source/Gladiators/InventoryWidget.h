@@ -9,21 +9,24 @@
 /**
  * 
  */
+class UImage;
 UCLASS()
 class GLADIATORS_API UInventoryWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+
 		UPROPERTY(VisibleAnywhere)
 		int InventoryCount;
 
-	
-	UFUNCTION(BlueprintCallable)
-		void AddToInventory();
+		UPROPERTY(EditAnywhere, meta = (BindWidget))
+			UImage* Slot1;
+		UPROPERTY(EditAnywhere, meta = (BindWidget))
+			UImage* Slot2;
+		UPROPERTY(EditAnywhere, meta = (BindWidget))
+			UImage* Slot3;
 
-	UFUNCTION(BlueprintCallable)
-		void RemoveFromInventory();
-
-	UFUNCTION(BlueprintCallable)
-		void ManageInventory();
+		UFUNCTION(BlueprintCallable)
+			void ManageInventory();
 };

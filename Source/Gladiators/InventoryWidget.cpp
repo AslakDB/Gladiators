@@ -2,33 +2,36 @@
 
 
 #include "InventoryWidget.h"
-
-void UInventoryWidget::AddToInventory()
-{
-	InventoryCount++;
-}
-
-void UInventoryWidget::RemoveFromInventory()
-{
-	InventoryCount--;
-}
+#include "Components/Image.h"
 
 void UInventoryWidget::ManageInventory()
 {
-	if (InventoryCount == 0)
+	if (Slot1 && Slot2 && Slot3)
 	{
-		//Show 0 inventory slots
-	}
-	else if (InventoryCount == 1)
-	{
-		//Show 1 Inventory Slot
-	}
-	else if (InventoryCount ==2)
-	{
-		//Show 2 Inventory slots
-	}
-	else
-	{
-		//Show 3 inventory slots
+		if (InventoryCount == 0)
+		{
+			Slot1->SetVisibility(ESlateVisibility::Hidden);
+			Slot2->SetVisibility(ESlateVisibility::Hidden);
+			Slot3->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else if (InventoryCount ==1)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("InventoryCount up"));
+			Slot1->SetVisibility(ESlateVisibility::Visible);
+			Slot2->SetVisibility(ESlateVisibility::Hidden);
+			Slot3->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else if (InventoryCount == 2)
+		{
+			Slot1->SetVisibility(ESlateVisibility::Visible);
+			Slot2->SetVisibility(ESlateVisibility::Visible);
+			Slot3->SetVisibility(ESlateVisibility::Hidden);
+		}
+		else
+		{
+			Slot3->SetVisibility(ESlateVisibility::Visible);
+			Slot1->SetVisibility(ESlateVisibility::Visible);
+			Slot2->SetVisibility(ESlateVisibility::Visible);
+		}
 	}
 }

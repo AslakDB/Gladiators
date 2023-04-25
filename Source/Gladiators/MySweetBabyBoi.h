@@ -7,6 +7,11 @@
 #include "MySweetBabyBoi.generated.h"
 
 struct FInputActionValue;
+class UItems;
+class ASword;
+class ASpear;
+class AAxe;
+
 
 UCLASS()
 class GLADIATORS_API AMySweetBabyBoi : public ACharacter
@@ -24,6 +29,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
 		class UCameraComponent* Camera{ nullptr };
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
+		class USphereComponent* ColliderPickup;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -55,8 +62,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
 		class UInputAction* DodgeInput;
 
-	UFUNCTION()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
+		class UInputAction* UseInput;
+
+	/*This opens and closes inventory*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* OpenInventory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* CloseInventory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* PauseGame;
+
+
+	
+
 		bool GetIsAttack();
+
+
+		bool InventoryIsOpen;
+
+
 
 	UFUNCTION()
 		void ResetAttack();
@@ -68,6 +93,20 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "BabyVariables | Animation")
 		float InputY;
 
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex,
+			bool bFromSweep, const FHitResult& SweepResult);
+
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<ASword*> NearbySword;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<ASpear*> NearbySpear;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<AAxe*> NearbyAxe;
+
 private:
 	void Forward(const FInputActionValue& input);
 	void Right(const FInputActionValue& input);
@@ -75,12 +114,17 @@ private:
 	void MouseY(const FInputActionValue& input);
 	void Attack(const FInputActionValue& input);
 	void Dodge(const FInputActionValue& input);
+	void Use(const FInputActionValue& input);
+	/*Functions for open and close inventory*/
+	void OpenInv(const FInputActionValue& input);
+	void CloseInv(const FInputActionValue& input);
+	void PausedGame(const FInputActionValue& input);
+
+
 	void Movement();
-
-
-	bool IsAttack;
-	float Yaw;
-	float Pitch;
+	void PickupSword();
+	void PickupSpear();
+	void PickupAxe();
 
 
 public:
@@ -88,4 +132,21 @@ public:
 		class UPlayerUserWidget* Widget = nullptr;
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UPlayerUserWidget> TWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UInventoryWidget* InventoryWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UInventoryWidget> TInventoryWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UPauseMenuWidget* PauseWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UPauseMenuWidget> TPauseWidget;
+
+
+
+	bool IsAttack;
+	float Yaw;
+	float Pitch;
+
 };
