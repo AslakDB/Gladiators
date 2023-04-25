@@ -48,6 +48,8 @@ void AMySweetBabyBoi::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Tags.Add(FName("EngagableTarget"));
+
 	GetCharacterMovement()->MaxWalkSpeed = 330.f;
 
 	// Add the mapping context
