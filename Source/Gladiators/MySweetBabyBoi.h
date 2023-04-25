@@ -64,9 +64,24 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
 		class UInputAction* UseInput;
+
+	/*This opens and closes inventory*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* OpenInventory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* CloseInventory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* PauseGame;
+
+
 	
 
 		bool GetIsAttack();
+
+
+		bool InventoryIsOpen;
+
+
 
 	UFUNCTION()
 		void ResetAttack();
@@ -100,10 +115,34 @@ private:
 	void Attack(const FInputActionValue& input);
 	void Dodge(const FInputActionValue& input);
 	void Use(const FInputActionValue& input);
+	/*Functions for open and close inventory*/
+	void OpenInv(const FInputActionValue& input);
+	void CloseInv(const FInputActionValue& input);
+	void PausedGame(const FInputActionValue& input);
+
+
 	void Movement();
 	void PickupSword();
 	void PickupSpear();
 	void PickupAxe();
+
+
+public:
+	UPROPERTY(VisibleAnywhere)
+		class UPlayerUserWidget* Widget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UPlayerUserWidget> TWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UInventoryWidget* InventoryWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UInventoryWidget> TInventoryWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UPauseMenuWidget* PauseWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UPauseMenuWidget> TPauseWidget;
+
 
 
 	bool IsAttack;
