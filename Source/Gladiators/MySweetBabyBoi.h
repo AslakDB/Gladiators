@@ -143,6 +143,8 @@ public:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UPauseMenuWidget> TPauseWidget;
 
+	UPROPERTY(VisibleAnywhere)
+		class AGameManager* Manager;
 
 
 	bool IsAttack;
