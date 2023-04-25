@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameManager.h"
 #include "Components/SphereComponent.h"
 
 #include "InventoryWidget.h"
@@ -50,12 +51,15 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+	
 }
 
 // Called when the game starts or when spawned
 void AMySweetBabyBoi::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Tags.Add(FName("EngagableTarget"));
 
 	GetCharacterMovement()->MaxWalkSpeed = 330.f;
 
@@ -137,6 +141,10 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 		
 		}
 	}
+
+	
+	
+
 }
 
 

@@ -4,12 +4,15 @@
 #include "Hud/PauseMenuWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
+#include "GameManager.h"
+
+
 
 void UPauseMenuWidget::PauseMenuManager()
 {
 	if (Resume->IsPressed())
 	{
-		Paused = false;
+			Paused = false;
 	}
 	if (Quit->IsPressed())
 	{

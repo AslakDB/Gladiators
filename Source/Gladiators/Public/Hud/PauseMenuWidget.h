@@ -16,6 +16,7 @@ class GLADIATORS_API UPauseMenuWidget : public UUserWidget
 {
 public:
 	GENERATED_BODY()
+	
 		UPROPERTY(VisibleAnywhere)
 		bool Paused;
 	UPROPERTY(EditAnywhere,meta = (BindWidget))
@@ -28,4 +29,5 @@ public:
 		UButton* Quit;
 	UFUNCTION()
 		void PauseMenuManager();
+	
 };
