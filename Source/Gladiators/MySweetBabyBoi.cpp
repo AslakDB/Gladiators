@@ -10,9 +10,20 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameManager.h"
+#include "Components/SphereComponent.h"
+
+#include "InventoryWidget.h"
+#include "Public/Hud/PauseMenuWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
 
 #include "PlayerUserWidget.h"
 #include "Blueprint/UserWidget.h"
+
+
+#include "Items/Weapons/Spear.h"
+#include "Items/Weapons/Sword.h"
+#include "Items/Weapons/Axe.h"
 
 // Sets default values
 AMySweetBabyBoi::AMySweetBabyBoi()
@@ -27,12 +38,20 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
+	ColliderPickup = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
+	ColliderPickup->SetupAttachment(GetRootComponent());
+	ColliderPickup->bHiddenInGame = false;
+	ColliderPickup->InitSphereRadius(100.f);
+	ColliderPickup->OnComponentBeginOverlap.AddDynamic(this, &AMySweetBabyBoi::OnOverlapBegin);
+	ColliderPickup->OnComponentEndOverlap.AddDynamic(this, &AMySweetBabyBoi::OnOverlapEnd);
+
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+	
 }
 
 // Called when the game starts or when spawned
@@ -43,19 +62,7 @@ void AMySweetBabyBoi::BeginPlay()
 	Tags.Add(FName("EngagableTarget"));
 
 	GetCharacterMovement()->MaxWalkSpeed = 330.f;
-	if (UWorld* World = GetWorld())
-	{
-		Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
-		if (Widget)
-		{
-			Widget->AddToViewport(999);
-			GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, FString("No Nullpt"));
-		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, FString("Nullpt error"));
-		}
-	}
+
 	// Add the mapping context
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
@@ -68,32 +75,79 @@ void AMySweetBabyBoi::BeginPlay()
 		}
 	}
 
-	
-	
+	if (UWorld* World = GetWorld())
+	{
+		Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
+		if (Widget)
+		{
+			Widget->AddToViewport(2);
+		}
+
+		PauseWidget = CreateWidget<UPauseMenuWidget>(World, TPauseWidget);
+		if (PauseWidget)
+		{
+			PauseWidget->AddToViewport(3);
+		}
+
+		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
+	}
+
+	if (InventoryWidget)
+	{
+		InventoryWidget->InventoryCount = 0;
+	}
+
+
 }
 
 // Called every frame
 void AMySweetBabyBoi::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaTime);
-
-	if (GetCharacterMovement()->IsFalling())
+	if (PauseWidget)
 	{
-		GetCharacterMovement()->bOrientRotationToMovement = false;
+		if (!PauseWidget->Paused)
+		{
+			Super::Tick(DeltaTime);
+
+			if (GetCharacterMovement()->IsFalling())
+			{
+				GetCharacterMovement()->bOrientRotationToMovement = false;
+			}
+			else
+			{
+				GetCharacterMovement()->bOrientRotationToMovement = true;
+			}
+
+			// Pulled this out to its own function
+
+			Movement();
+
+			AddControllerYawInput(Yaw);
+			AddControllerPitchInput(Pitch);
+
+			PauseWidget->RemoveFromParent();
+			APlayerController* PlayerController = Cast<APlayerController>(Controller);
+			PlayerController->SetShowMouseCursor(false);
+			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
+		}
+		
+		else
+		{
+			PauseWidget->AddToViewport();
+			PauseWidget->PauseMenuManager();
+			APlayerController* PlayerController = Cast<APlayerController>(Controller);
+			PlayerController->SetShowMouseCursor(true);
+			UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerController, PauseWidget);
+		
+		}
 	}
-	else
-	{
-		GetCharacterMovement()->bOrientRotationToMovement = true;
-	}
 
-	// Pulled this out to its own function
-
-	Movement();
-
-	AddControllerYawInput(Yaw);
-	AddControllerPitchInput(Pitch);
+	
+	
 
 }
+
+
 
 // Called to bind functionality to input
 void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -107,7 +161,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(RightInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Right);
 		EnhanceInputCom->BindAction(ForwardInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::Forward);
 		EnhanceInputCom->BindAction(RightInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::Right);
-		EnhanceInputCom->BindAction(AttackInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Attack);
+		//EnhanceInputCom->BindAction(AttackInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Attack);
 		EnhanceInputCom->BindAction(DodgeInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Dodge);
 		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::MouseX);
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::MouseY);
@@ -115,6 +169,14 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::MouseY);
 		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseX);
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseY);
+		EnhanceInputCom->BindAction(UseInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Use);
+		/*Code for input on open and close inventory*/
+		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::OpenInv);
+		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::OpenInv);
+		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::CloseInv);
+		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);
+		EnhanceInputCom->BindAction(PauseGame, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::PausedGame);
+
 	}
 }
 
@@ -143,6 +205,30 @@ void AMySweetBabyBoi::Movement()
 	}
 }
 
+void AMySweetBabyBoi::PickupSword()
+{
+	ASword* ItemToDestroy = NearbySword[0];
+	NearbySword.RemoveAt(0);
+	ItemToDestroy->Pickup();
+
+	
+}
+
+void AMySweetBabyBoi::PickupSpear()
+{
+	ASpear* SpearToDestroy = NearbySpear[0];
+	NearbySpear.RemoveAt(0);
+	SpearToDestroy->Pickup();
+}
+
+void AMySweetBabyBoi::PickupAxe()
+{
+	AAxe* AxeToDestroy = NearbyAxe[0];
+	NearbyAxe.RemoveAt(0);
+	AxeToDestroy->Pickup();
+}
+
+
 bool AMySweetBabyBoi::GetIsAttack()
 {
 	return IsAttack;
@@ -151,6 +237,38 @@ bool AMySweetBabyBoi::GetIsAttack()
 void AMySweetBabyBoi::ResetAttack()
 {
 	IsAttack = false;
+}
+
+void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor->IsA<ASword>())
+	{
+		NearbySword.Add(Cast<ASword>(OtherActor));
+	}
+	if (OtherActor->IsA<ASpear>())
+	{
+		NearbySpear.Add(Cast<ASpear>(OtherActor));
+	}
+	if (OtherActor->IsA<AAxe>())
+	{
+		NearbyAxe.Add(Cast<AAxe>(OtherActor));
+	}
+}
+
+void AMySweetBabyBoi::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
+{	
+	if (OtherActor->IsA<ASword>())
+	{
+		NearbySword.Remove(Cast<ASword>(OtherActor));
+	}
+	if(OtherActor->IsA<ASpear>())
+	{
+		NearbySpear.Remove(Cast<ASpear>(OtherActor));
+	}
+	if(OtherActor->IsA<AAxe>())
+	{
+		NearbyAxe.Remove(Cast<AAxe>(OtherActor));
+	}
 }
 
 void AMySweetBabyBoi::Forward(const FInputActionValue& input)
@@ -181,5 +299,54 @@ void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
 {
 }
+
+void AMySweetBabyBoi::Use(const FInputActionValue& input)
+{
+	if (NearbySword.Num() > 0)
+	{
+		PickupSword();
+		return;
+	}
+	if (NearbySpear.Num() > 0)
+	{
+		PickupSpear();
+		return;
+	}
+	if (NearbyAxe.Num() > 0)
+	{
+		PickupAxe();
+		return;
+	}
+}
+
+void AMySweetBabyBoi::OpenInv(const FInputActionValue& input)
+{
+	if (InventoryWidget)
+	{
+		InventoryWidget->AddToViewport(1);
+	}
+}
+
+void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
+{
+	if (InventoryWidget)
+	{
+		InventoryWidget->RemoveFromParent();
+	}
+}
+
+	void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
+	{
+		if (PauseWidget)
+		{
+			if (!PauseWidget->Paused)
+			{
+				PauseWidget->Paused = true;
+			}
+
+		}
+	}
+
+
 
 
