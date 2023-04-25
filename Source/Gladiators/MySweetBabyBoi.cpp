@@ -114,12 +114,18 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			}
 			AddControllerPitchInput(Pitch);
 			PauseWidget->RemoveFromParent();
+			APlayerController* PlayerController = Cast<APlayerController>(Controller);
+			PlayerController->SetShowMouseCursor(false);
+			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
 		}
 		else
 		{
 
 			PauseWidget->AddToViewport();
 			PauseWidget->PauseMenuManager();
+			APlayerController* PlayerController = Cast<APlayerController>(Controller);
+			PlayerController->SetShowMouseCursor(true);
+			UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerController,PauseWidget);
 		}
 	}
 }
