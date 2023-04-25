@@ -9,7 +9,8 @@
 			"Type": "Runtime",
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
-				"Engine"
+				"Engine",
+				"UMG"
 			]
 		}
 	],
@@ -21,8 +22,5 @@
 				"Editor"
 			]
 		}
-	],
-	"TargetPlatforms": [
-		"Windows"
 	]
 }
