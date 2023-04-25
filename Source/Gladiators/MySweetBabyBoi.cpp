@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "InventoryWidget.h"
 
 #include "PlayerUserWidget.h"
 #include "Blueprint/UserWidget.h"
@@ -48,13 +49,9 @@ void AMySweetBabyBoi::BeginPlay()
 		Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
 		if (Widget)
 		{
-			Widget->AddToViewport(999);
-			GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, FString("No Nullpt"));
+			Widget->AddToViewport(2);
 		}
-		else
-		{
-			GEngine->AddOnScreenDebugMessage(1, 60.f, FColor::Cyan, FString("Nullpt error"));
-		}
+		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
 	}
 	// Add the mapping context
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
@@ -67,15 +64,13 @@ void AMySweetBabyBoi::BeginPlay()
 
 		}
 	}
-
-	
-	
 }
 
 // Called every frame
 void AMySweetBabyBoi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 
 	if (GetCharacterMovement()->IsFalling())
 	{
@@ -86,13 +81,14 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 
-	// Pulled this out to its own function
+
 
 	Movement();
 
 	AddControllerYawInput(Yaw);
 	AddControllerPitchInput(Pitch);
 
+	
 }
 
 // Called to bind functionality to input
@@ -115,18 +111,23 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::MouseY);
 		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseX);
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseY);
+		/*Code for input on open and close inventory*/
+		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::OpenInv);
+		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::OpenInv);
+		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::CloseInv);
+		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);
 	}
 }
 
 void AMySweetBabyBoi::Movement()
 {
-	//Movement
+	
 	FRotator ControlRotation = Controller->GetControlRotation();
 
 	ControlRotation.Roll = 0.f;
 	ControlRotation.Pitch = 0.f;
 
-	//Getting the direction we're looking, and the right vector = cross product of forward and up vectors
+	
 	FVector ForwardVector = UKismetMathLibrary::GetForwardVector(ControlRotation);
 	FVector RightVector = UKismetMathLibrary::GetRightVector(ControlRotation);
 
@@ -182,4 +183,21 @@ void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
 {
 }
 
+void AMySweetBabyBoi::OpenInv(const FInputActionValue& input)
+{
+	
+	if (InventoryWidget)
+	{
+		InventoryWidget->AddToViewport(1);
+	}
+	
+}
+inline void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
+{
+	
+	if (InventoryWidget )
+	{
+		InventoryWidget->RemoveFromParent();
+	}
+}
 

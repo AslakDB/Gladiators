@@ -41,6 +41,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputAction* ForwardInput;
 
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputAction* RightInput;
 
@@ -55,11 +56,22 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
 		class UInputAction* DodgeInput;
 
+	/*This opens and closes inventory*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* OpenInventory;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* CloseInventory;
+
+
+
 	UFUNCTION()
 		bool GetIsAttack();
 
 	UFUNCTION()
 		void ResetAttack();
+
+	
+		bool InventoryIsOpen;
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "BabyVariables | Animation")
@@ -76,7 +88,9 @@ private:
 	void Attack(const FInputActionValue& input);
 	void Dodge(const FInputActionValue& input);
 	void Movement();
-
+	/*Functions for open and close inventory*/
+	void OpenInv(const FInputActionValue& input);
+	void CloseInv(const FInputActionValue& input);
 
 	bool IsAttack;
 	float Yaw;
@@ -88,4 +102,11 @@ public:
 		class UPlayerUserWidget* Widget = nullptr;
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UPlayerUserWidget> TWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UInventoryWidget* InventoryWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UInventoryWidget> TInventoryWidget;
 };
+
+
