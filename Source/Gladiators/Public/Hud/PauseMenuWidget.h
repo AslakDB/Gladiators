@@ -29,6 +29,5 @@ public:
 		UButton* Quit;
 	UFUNCTION()
 		void PauseMenuManager();
-	UPROPERTY()
-		class AGameManager* Manager;
+	
 };

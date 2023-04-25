@@ -51,8 +51,7 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
-	Manager = CreateDefaultSubobject<AGameManager>(TEXT("Manager"));
-	Manager->Paused = false;
+	
 }
 
 // Called when the game starts or when spawned
@@ -104,9 +103,9 @@ void AMySweetBabyBoi::BeginPlay()
 // Called every frame
 void AMySweetBabyBoi::Tick(float DeltaTime)
 {
-	if (Manager)
+	if (PauseWidget)
 	{
-		if (!Manager->Paused)
+		if (!PauseWidget->Paused)
 		{
 			Super::Tick(DeltaTime);
 
@@ -143,10 +142,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 		}
 	}
 
-	if (!PauseWidget->Paused)
-	{
-		Manager->Paused = false;
-	}
+	
 	
 
 }
@@ -341,11 +337,11 @@ void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
 
 	void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 	{
-		if (Manager)
+		if (PauseWidget)
 		{
-			if (!Manager->Paused)
+			if (!PauseWidget->Paused)
 			{
-				Manager->Paused = true;
+				PauseWidget->Paused = true;
 			}
 
 		}
