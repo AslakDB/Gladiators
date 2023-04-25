@@ -10,6 +10,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameManager.h"
 #include "Components/SphereComponent.h"
 
 #include "InventoryWidget.h"
@@ -49,6 +50,8 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 	bUseControllerRotationRoll = false;
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
+
+	Manager = CreateDefaultSubobject<AGameManager>(TEXT("Manager"));
 
 }
 
@@ -99,9 +102,9 @@ void AMySweetBabyBoi::BeginPlay()
 // Called every frame
 void AMySweetBabyBoi::Tick(float DeltaTime)
 {
-	if (PauseWidget)
+	if (Manager)
 	{
-		if (!PauseWidget->Paused)
+		if (!Manager->Paused)
 		{
 			Super::Tick(DeltaTime);
 
@@ -329,9 +332,9 @@ void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
 
 	void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 	{
-		if (PauseWidget)
+		if (Manager)
 		{
-			if (!PauseWidget->Paused)
+			if (!Manager->Paused)
 			{
 				PauseWidget->Paused = true;
 			}
