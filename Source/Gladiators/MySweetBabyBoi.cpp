@@ -38,12 +38,12 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
-	ColliderPickup = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
-	ColliderPickup->SetupAttachment(GetRootComponent());
-	ColliderPickup->bHiddenInGame = false;
-	ColliderPickup->InitSphereRadius(100.f);
-	ColliderPickup->OnComponentBeginOverlap.AddDynamic(this, &AMySweetBabyBoi::OnOverlapBegin);
-	ColliderPickup->OnComponentEndOverlap.AddDynamic(this, &AMySweetBabyBoi::OnOverlapEnd);
+	ColliderPickupWork = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
+	ColliderPickupWork->SetupAttachment(GetRootComponent());
+	ColliderPickupWork->bHiddenInGame = false;
+	ColliderPickupWork->InitSphereRadius(100.f);
+	ColliderPickupWork->OnComponentBeginOverlap.AddDynamic(this, &AMySweetBabyBoi::OnOverlapBegin);
+	ColliderPickupWork->OnComponentEndOverlap.AddDynamic(this, &AMySweetBabyBoi::OnOverlapEnd);
 
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationPitch = false;
@@ -210,8 +210,10 @@ void AMySweetBabyBoi::PickupSword()
 	ASword* ItemToDestroy = NearbySword[0];
 	NearbySword.RemoveAt(0);
 	ItemToDestroy->Pickup();
-
-	
+	HaveSword = true;
+	HaveAxe = false;
+	HaveSpear = false;
+	UE_LOG(LogTemp, Warning, TEXT("U have le sword"));
 }
 
 void AMySweetBabyBoi::PickupSpear()
@@ -219,6 +221,9 @@ void AMySweetBabyBoi::PickupSpear()
 	ASpear* SpearToDestroy = NearbySpear[0];
 	NearbySpear.RemoveAt(0);
 	SpearToDestroy->Pickup();
+	HaveSpear = true;
+	HaveSword = false;
+	HaveAxe = false;
 }
 
 void AMySweetBabyBoi::PickupAxe()
@@ -226,6 +231,9 @@ void AMySweetBabyBoi::PickupAxe()
 	AAxe* AxeToDestroy = NearbyAxe[0];
 	NearbyAxe.RemoveAt(0);
 	AxeToDestroy->Pickup();
+	HaveAxe = true;
+	HaveSword = false;
+	HaveSpear = false;
 }
 
 
@@ -237,6 +245,9 @@ bool AMySweetBabyBoi::GetIsAttack()
 void AMySweetBabyBoi::ResetAttack()
 {
 	IsAttack = false;
+	SwordAttack = false;
+	AxeAttack = false;
+	SpearAttack = false;
 }
 
 void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -294,6 +305,18 @@ void AMySweetBabyBoi::MouseY(const FInputActionValue& input)
 void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 {
 	IsAttack = true;
+	if(HaveSword)
+	{
+		SwordAttack = true;
+	}
+	if(HaveAxe)
+	{
+		AxeAttack = true;
+	}
+	if(HaveSpear)
+	{
+		SpearAttack = true;
+	}
 }
 
 void AMySweetBabyBoi::Dodge(const FInputActionValue& input)

@@ -13,7 +13,7 @@ ASpear::ASpear()
 	SpearCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	SetRootComponent(SpearCollider);
 	SpearCollider->bHiddenInGame = false;
-	SpearCollider->InitSphereRadius(100.f);
+	SpearCollider->InitSphereRadius(50.f);
 	SpearCollider->OnComponentBeginOverlap.AddDynamic(this, &ASpear::SpearOnOverlapBegin);
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(GetRootComponent());
