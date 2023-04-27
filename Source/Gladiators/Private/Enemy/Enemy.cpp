@@ -94,7 +94,7 @@ void AEnemy::Die()
 	ClearAttackTimer();
 	HideHealthBar();
 	DisableCapsule();
-	//SetLifeSpan(DeathLifeSpan);
+	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 }

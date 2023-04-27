@@ -3,7 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Characters/BaseCharacter.h"
 #include "GameFramework/Character.h"
+#include "Characters/CharacterStates.h"
 #include "MySweetBabyBoi.generated.h"
 
 struct FInputActionValue;
@@ -12,9 +14,12 @@ class ASword;
 class ASpear;
 class AAxe;
 
+class AItem;
+class UAnimMontage;
+
 
 UCLASS()
-class GLADIATORS_API AMySweetBabyBoi : public ACharacter
+class GLADIATORS_API AMySweetBabyBoi : public ABaseCharacter
 {
 	GENERATED_BODY()
 
@@ -22,6 +27,13 @@ public:
 	// Sets default values for this character's properties
 	AMySweetBabyBoi();
 
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	// Called to bind functionality to input
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
 		class USpringArmComponent* SpringArm{ nullptr };
@@ -36,12 +48,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputMappingContext* MappingContext;
 
@@ -73,9 +80,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputAction* PauseGame;
 
+	/*TEST*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+	class UInputAction* FKeyAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	class UInputAction* AttackAction;
+
 
 	
-
 		bool GetIsAttack();
 
 
@@ -112,7 +125,7 @@ private:
 	void Right(const FInputActionValue& input);
 	void MouseX(const FInputActionValue& input);
 	void MouseY(const FInputActionValue& input);
-	void Attack(const FInputActionValue& input);
+	//void Attack(const FInputActionValue& input);
 	void Dodge(const FInputActionValue& input);
 	void Use(const FInputActionValue& input);
 	/*Functions for open and close inventory*/
@@ -148,5 +161,37 @@ public:
 	bool IsAttack;
 	float Yaw;
 	float Pitch;
+
+protected:
+
+	void FKeyPressed();
+	virtual void Attack() override;
+
+	/** Combat */
+	void EquipWeapon(AWeapon* Weapon);
+	virtual void AttackEnd() override;
+	virtual bool CanAttack() override;
+	bool CanDisarm();
+	bool CanArm();
+	void Disarm();
+	void Arm();
+	void PlayEquipMontage(const FName& SectionName);
+
+private:
+
+	UPROPERTY(VisibleInstanceOnly)
+	AItem* OverlappingItem;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* EquipMontage;
+
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState = EActionState::EAS_Unoccupied;
+
+public:
+	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
 };

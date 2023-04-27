@@ -2,7 +2,7 @@
 
 
 #include "Items/Weapons/Weapon.h"
-//#include "Characters/NewCharacter.h"
+#include "Gladiators/MySweetBabyBoi.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/SphereComponent.h"
 #include "Components/BoxComponent.h"
@@ -37,6 +37,7 @@ void AWeapon::Equip(USceneComponent* InParent, FName InSocketName, AActor* NewOw
 	SetOwner(NewOwner);
 	SetInstigator(NewInstigator);
 	AttachMeshToSocket(InParent, InSocketName);
+	DisableSphereCollision();
 }
 
 void AWeapon::DisableSphereCollision()
