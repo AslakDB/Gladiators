@@ -42,7 +42,16 @@ public:
 		class UCameraComponent* Camera{ nullptr };
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
-		class USphereComponent* ColliderPickup;
+		class USphereComponent* ColliderPickupWork;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
+		class UStaticMeshComponent* Mesh1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
+		class UStaticMeshComponent* MeshSword;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
+		class UStaticMeshComponent* MeshSpear;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
+		class UStaticMeshComponent* MeshAxe;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -157,8 +166,28 @@ public:
 		TSubclassOf<UPauseMenuWidget> TPauseWidget;
 
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attack")
+		bool SwordAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool AxeAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool SpearAttack;
 
 	bool IsAttack;
+	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HaveSword;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HaveAxe;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HaveSpear;
+
+
 	float Yaw;
 	float Pitch;
 
