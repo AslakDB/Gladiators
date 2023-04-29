@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
-#include "GameFramework/Character.h"
 #include "Characters/CharacterStates.h"
 #include "MySweetBabyBoi.generated.h"
 
@@ -24,15 +23,10 @@ class GLADIATORS_API AMySweetBabyBoi : public ABaseCharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AMySweetBabyBoi();
-
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
@@ -205,6 +199,9 @@ protected:
 	void Disarm();
 	void Arm();
 	void PlayEquipMontage(const FName& SectionName);
+
+	UFUNCTION(BlueprintCallable)
+	void HitReactEnd();
 
 private:
 

@@ -43,12 +43,10 @@ protected:
 	/** </ABaseCharacter> */
 
 	UPROPERTY(BlueprintReadOnly)
-	TEnumAsByte<EDeathPose> DeathPose;
-
-	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 private:
+
 	/** AI Behavior */
 	void InitializeEnemy();
 	void CheckPatrolTarget();

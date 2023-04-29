@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Weapon.h"
 #include "Sword.generated.h"
 
 class USphereComponent;
 UCLASS()
-class GLADIATORS_API ASword : public AActor
+class GLADIATORS_API ASword : public AWeapon
 {
 	GENERATED_BODY()
 	
