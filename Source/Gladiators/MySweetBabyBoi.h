@@ -11,7 +11,8 @@ class UItems;
 class ASword;
 class ASpear;
 class AAxe;
-
+class AEnemy;
+class AHealthPotion;
 
 UCLASS()
 class GLADIATORS_API AMySweetBabyBoi : public ACharacter
@@ -40,6 +41,9 @@ public:
 		class UStaticMeshComponent* MeshSpear;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
 		class UStaticMeshComponent* MeshAxe;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		AEnemy* Enemy;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -87,9 +91,14 @@ public:
 
 		bool GetIsAttack();
 
+		bool GameIsPaused;
 
 		bool InventoryIsOpen;
 
+	UPROPERTY()
+		int MaxHealth;
+	UPROPERTY()
+		int Health;
 
 
 	UFUNCTION()
@@ -116,6 +125,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<AAxe*> NearbyAxe;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Potion")
+		TArray<AHealthPotion*> Potions;
+
+
 private:
 	void Forward(const FInputActionValue& input);
 	void Right(const FInputActionValue& input);
@@ -134,6 +147,7 @@ private:
 	void PickupSword();
 	void PickupSpear();
 	void PickupAxe();
+	void PickupPotion();
 
 
 public:
@@ -151,6 +165,16 @@ public:
 		class UPauseMenuWidget* PauseWidget = nullptr;
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UPauseMenuWidget> TPauseWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UBossWidget* CyclopsWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UBossWidget> TCyclopsWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UBossWidget* ManticoreWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UBossWidget> TManticoreWidget;
 
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attack")
@@ -177,5 +201,7 @@ public:
 
 	float Yaw;
 	float Pitch;
+
+
 
 };
