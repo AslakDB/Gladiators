@@ -130,6 +130,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			}
 
 			// Pulled this out to its own function
+			Health -=1 * DeltaTime ;
 
 			Movement();
 
@@ -150,7 +151,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			if (Widget)
 			{
 
-				Widget->SetPlayerHealth(MaxHealth, Health);
+				Widget->SetPlayerHealth(Health, MaxHealth);
 			}
 			if(CyclopsWidget && Enemy)
 			{
@@ -398,7 +399,11 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 		GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Potions nearby"));
 
 		PickupPotion();
-		
+	}
+	if (InventoryWidget->IsInViewport() && InventoryWidget->InventoryCount !=0)
+	{
+		Health = MaxHealth;
+		InventoryWidget->InventoryCount--;
 	}
 }
 
@@ -408,6 +413,7 @@ void AMySweetBabyBoi::OpenInv(const FInputActionValue& input)
 	{
 		InventoryWidget->AddToViewport(1);
 	}
+	
 }
 
 void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
