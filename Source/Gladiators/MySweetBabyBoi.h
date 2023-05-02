@@ -261,7 +261,7 @@ public:
 protected:
 
 	void FKeyPressed();
-	virtual void Attack() override;
+	//virtual void Attack() override;
 
 	/** Combat */
 	void EquipWeapon(AWeapon* Weapon);

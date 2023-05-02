@@ -189,10 +189,6 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			UGameplayStatics::SetGamePaused(this, true);
 		}
 	}
-
-	
-	
-
 }
 
 
@@ -229,7 +225,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 		/*TEST*/
 		EnhanceInputCom->BindAction(FKeyAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::FKeyPressed);
-		EnhanceInputCom->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Attack);
+		//EnhanceInputCom->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Attack);
 
 	}
 }
@@ -429,22 +425,22 @@ void AMySweetBabyBoi::MouseY(const FInputActionValue& input)
 	Pitch = input.Get<float>();
 }
 
-//void AMySweetBabyBoi::Attack(const FInputActionValue& input)
-//{
-//	IsAttack = true;
-//	if(HaveSword)
-//	{
-//		SwordAttack = true;
-//	}
-//	if(HaveAxe)
-//	{
-//		AxeAttack = true;
-//	}
-//	if(HaveSpear)
-//	{
-//		SpearAttack = true;
-//	}
-//}
+void AMySweetBabyBoi::Attack(const FInputActionValue& input)
+{
+	IsAttack = true;
+	if(HaveSword)
+	{
+		SwordAttack = true;
+	}
+	if(HaveAxe)
+	{
+		AxeAttack = true;
+	}
+	if(HaveSpear)
+	{
+		SpearAttack = true;
+	}
+}
 
 void AMySweetBabyBoi::HeavyAttack(const FInputActionValue& input)
 {
@@ -551,15 +547,15 @@ void AMySweetBabyBoi::FKeyPressed()
 	}
 }
 
-void AMySweetBabyBoi::Attack()
-{
-	Super::Attack();
-	if (CanAttack())
-	{
-		PlayAttackMontage();
-		ActionState = EActionState::EAS_Attacking;
-	}
-}
+//void AMySweetBabyBoi::Attack()
+//{
+//	Super::Attack();
+//	if (CanAttack())
+//	{
+//		PlayAttackMontage();
+//		ActionState = EActionState::EAS_Attacking;
+//	}
+//}
 
 void AMySweetBabyBoi::EquipWeapon(AWeapon* Weapon)
 {
