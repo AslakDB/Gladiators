@@ -13,6 +13,7 @@
 #include "GameManager.h"
 #include "Components/SphereComponent.h"
 #include "BossWidget.h"
+#include "Public/Enemy/Enemy.h"
 
 #include "InventoryWidget.h"
 #include "Public/Hud/PauseMenuWidget.h"

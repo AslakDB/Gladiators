@@ -11,6 +11,7 @@ class UItems;
 class ASword;
 class ASpear;
 class AAxe;
+class AHealthPotion;
 
 
 UCLASS()
@@ -94,6 +95,10 @@ public:
 
 		bool GetIsAttack();
 
+		int MaxHealth;
+			int Health;
+			bool GameIsPaused;
+
 
 		bool InventoryIsOpen;
 
@@ -131,6 +136,8 @@ public:
 		TArray<ASpear*> NearbySpear;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<AAxe*> NearbyAxe;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<AHealthPotion*> Potions;
 
 private:
 	void Forward(const FInputActionValue& input);
@@ -151,6 +158,7 @@ private:
 	void PickupSword();
 	void PickupSpear();
 	void PickupAxe();
+	void PickupPotion();
 
 	
 
@@ -173,6 +181,19 @@ public:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UPauseMenuWidget> TPauseWidget;
 
+	UPROPERTY(VisibleAnywhere)
+		class UBossWidget* CyclopsWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UBossWidget> TCyclopsWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UBossWidget* ManticoreWidget = nullptr;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UBossWidget> TManticoreWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class AEnemy* Enemy;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		AActor* SpawnSword = nullptr;
@@ -190,6 +211,11 @@ public:
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class AAxe>Axe;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		AActor* Potions = nullptr;*/
+
+	
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attack")
 		bool SwordAttack;
