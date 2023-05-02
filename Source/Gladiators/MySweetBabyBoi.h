@@ -12,6 +12,7 @@ class UItems;
 class ASword;
 class ASpear;
 class AAxe;
+class AHealthPotion;
 
 class AItem;
 class UAnimMontage;
@@ -46,6 +47,9 @@ public:
 		class UStaticMeshComponent* MeshSpear;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
 		class UStaticMeshComponent* MeshAxe;
+
+	
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -69,6 +73,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputAction* AttackInput;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+		class UInputAction* HeavyAttackInput;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
 		class UInputAction* DodgeInput;
 
@@ -94,6 +102,10 @@ public:
 	
 		bool GetIsAttack();
 
+		int MaxHealth;
+			int Health;
+			bool GameIsPaused;
+
 
 		bool InventoryIsOpen;
 
@@ -110,6 +122,15 @@ public:
 		float InputY;
 
 	UFUNCTION()
+		void GetSword();
+
+	UFUNCTION()
+		void GetSpear();
+
+	UFUNCTION()
+		void GetAxe();
+
+	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex,
 			bool bFromSweep, const FHitResult& SweepResult);
@@ -122,13 +143,16 @@ public:
 		TArray<ASpear*> NearbySpear;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<AAxe*> NearbyAxe;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<AHealthPotion*> Potions;
 
 private:
 	void Forward(const FInputActionValue& input);
 	void Right(const FInputActionValue& input);
 	void MouseX(const FInputActionValue& input);
 	void MouseY(const FInputActionValue& input);
-	//void Attack(const FInputActionValue& input);
+	void Attack(const FInputActionValue& input);
+	void HeavyAttack(const FInputActionValue& input);
 	void Dodge(const FInputActionValue& input);
 	void Use(const FInputActionValue& input);
 	/*Functions for open and close inventory*/
@@ -141,9 +165,14 @@ private:
 	void PickupSword();
 	void PickupSpear();
 	void PickupAxe();
+	void PickupPotion();
+
+	
 
 
 public:
+
+
 	UPROPERTY(VisibleAnywhere)
 		class UPlayerUserWidget* Widget = nullptr;
 	UPROPERTY(EditAnywhere)
@@ -159,6 +188,41 @@ public:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UPauseMenuWidget> TPauseWidget;
 
+	UPROPERTY(VisibleAnywhere)
+		class UBossWidget* CyclopsWidget = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UBossWidget> TCyclopsWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class UBossWidget* ManticoreWidget = nullptr;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UBossWidget> TManticoreWidget;
+
+	UPROPERTY(VisibleAnywhere)
+		class AEnemy* Enemy;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		AActor* SpawnSword = nullptr;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ASword> Sword;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		AActor* SpawnSpear = nullptr;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class ASpear>Spear;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		AActor* SpawnAxe = nullptr;
+
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class AAxe>Axe;
+
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		AActor* Potions = nullptr;*/
+
+	
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attack")
 		bool SwordAttack;
@@ -168,6 +232,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		bool SpearAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HeavySwordAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HeavyAxeAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HeavySpearAttack;
 
 	bool IsAttack;
 	

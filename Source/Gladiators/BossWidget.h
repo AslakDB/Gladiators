@@ -12,7 +12,9 @@
 UCLASS()
 class GLADIATORS_API UBossWidget : public UUserWidget
 {
+public:
 	GENERATED_BODY()
+public:
 		UFUNCTION(BlueprintCallable, Category = "HUD")
 		void SetBossHealth(float CurrentHealth, float MaxHealth);
 
