@@ -30,6 +30,12 @@
 #include "Items/Weapons/Axe.h"
 #include "Kismet/GameplayStatics.h"
 
+#include "Components/StaticMeshComponent.h"
+#include "Components/InputComponent.h"
+#include "Items/Item.h"
+#include "Items/Weapons/Weapon.h"
+#include "Animation/AnimMontage.h"
+
 // Sets default values
 AMySweetBabyBoi::AMySweetBabyBoi()
 {
@@ -59,6 +65,12 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
+	
 	MaxHealth = 100;
 	Health = MaxHealth;
 
@@ -177,10 +189,6 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			UGameplayStatics::SetGamePaused(this, true);
 		}
 	}
-
-	
-	
-
 }
 
 
@@ -215,11 +223,33 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);
 		EnhanceInputCom->BindAction(PauseGame, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::PausedGame);
 
+		/*TEST*/
+		EnhanceInputCom->BindAction(FKeyAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::FKeyPressed);
+		//EnhanceInputCom->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Attack);
+
 	}
+}
+
+float AMySweetBabyBoi::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	HandleDamage(DamageAmount);
+	return DamageAmount;
+}
+
+void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit)
+{
+	Super::GetHit_Implementation(ImpactPoint, ActorHit);
+
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+	ActionState = EActionState::EAS_HitReaction;
+
+	PlayHitSound(ImpactPoint);
+	SpawnHitParticles(ImpactPoint);
 }
 
 void AMySweetBabyBoi::Movement()
 {
+	if (ActionState != EActionState::EAS_Unoccupied) return;
 	//Movement
 	FRotator ControlRotation = Controller->GetControlRotation();
 
@@ -316,7 +346,6 @@ void AMySweetBabyBoi::PickupPotion()
 		InventoryWidget->InventoryCount++;
 	}
 }
-
 
 bool AMySweetBabyBoi::GetIsAttack()
 {
@@ -484,7 +513,7 @@ void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
 	}
 }
 
-	void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
+void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 	{
 		if (PauseWidget)
 		{
@@ -498,6 +527,91 @@ void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
 		}
 	}
 
+void AMySweetBabyBoi::FKeyPressed()
+{
+	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	if (OverlappingWeapon)
+	{
+		EquipWeapon(OverlappingWeapon);
+	}
+	else
+	{
+		if (CanDisarm())
+		{
+			Disarm();
+		}
+		else if (CanArm())
+		{
+			Arm();
+		}
+	}
+}
 
+//void AMySweetBabyBoi::Attack()
+//{
+//	Super::Attack();
+//	if (CanAttack())
+//	{
+//		PlayAttackMontage();
+//		ActionState = EActionState::EAS_Attacking;
+//	}
+//}
 
+void AMySweetBabyBoi::EquipWeapon(AWeapon* Weapon)
+{
+	Weapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+	CharacterState = ECharacterState::ECS_EquippedSword;
+	OverlappingItem = nullptr;
+	EquippedWeapon = Weapon;
+}
 
+void AMySweetBabyBoi::AttackEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+bool AMySweetBabyBoi::CanAttack()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool AMySweetBabyBoi::CanDisarm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool AMySweetBabyBoi::CanArm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState == ECharacterState::ECS_Unequipped &&
+		EquippedWeapon;
+}
+
+void AMySweetBabyBoi::Disarm()
+{
+	PlayEquipMontage(FName("Unequip"));
+	CharacterState = ECharacterState::ECS_Unequipped;
+}
+
+void AMySweetBabyBoi::Arm()
+{
+	PlayEquipMontage(FName("Equip"));
+	CharacterState = ECharacterState::ECS_EquippedSword;
+}
+
+void AMySweetBabyBoi::PlayEquipMontage(const FName& SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && EquipMontage)
+	{
+			AnimInstance->Montage_Play(EquipMontage);
+			AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+	}
+}
+
+void AMySweetBabyBoi::HitReactEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}

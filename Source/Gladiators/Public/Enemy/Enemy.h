@@ -54,12 +54,10 @@ protected:
 	/** </ABaseCharacter> */
 
 	UPROPERTY(BlueprintReadOnly)
-	TEnumAsByte<EDeathPose> DeathPose;
-
-	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 private:
+
 	/** AI Behavior */
 	void InitializeEnemy();
 	void CheckPatrolTarget();
@@ -101,7 +99,7 @@ private:
 	AActor* CombatTarget;
 
 	UPROPERTY(EditAnywhere)
-	double CombatRadius = 1000.f;
+	double CombatRadius = 500.f;
 
 	UPROPERTY(EditAnywhere)
 	double AttackRadius = 150.f;
@@ -142,7 +140,7 @@ private:
 	float ChasingSpeed = 300.f;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	float DeathLifeSpan = 8.f;
+	float DeathLifeSpan = 3.5;
 };
 
 

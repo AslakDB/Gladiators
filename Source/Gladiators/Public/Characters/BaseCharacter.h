@@ -5,10 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/HitInterface.h"
+#include "Characters/CharacterStates.h"
 #include "BaseCharacter.generated.h"
 
 class AWeapon;
 class UAttributeComponent;
+class UAnimMontage;
 
 UCLASS()
 class GLADIATORS_API ABaseCharacter : public ACharacter, public IHitInterface
@@ -21,6 +23,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
 	virtual void Attack();
 	virtual void Die();
 	void DirectionalHitReact(const FVector& ImpactPoint);
@@ -30,44 +33,54 @@ protected:
 	void DisableCapsule();
 	virtual bool CanAttack();
 	bool IsAlive();
+	void DisableMeshCollision();
+
+
 	void PlayHitReactMontage(const FName& SectionName);
 	virtual int32 PlayAttackMontage();
 	virtual int32 PlayDeathMontage();
+	void StopAttackMontage();
 
 	UFUNCTION(BlueprintCallable)
-		virtual void AttackEnd();
+	virtual void AttackEnd();
 
 	UFUNCTION(BlueprintCallable)
-		void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
+	void SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled);
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
-		AWeapon* EquippedWeapon;
+	AWeapon* EquippedWeapon;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UAttributeComponent* Attributes;
+	UAttributeComponent* Attributes;
+
+	UPROPERTY(BlueprintReadOnly)
+	TEnumAsByte<EDeathPose> DeathPose;
 
 private:
 	void PlayMontageSection(UAnimMontage* Montage, const FName& SectionName);
 	int32 PlayRandomMontageSection(UAnimMontage* Montage, const TArray<FName>& SectionNames);
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-		USoundBase* HitSound;
+	USoundBase* HitSound;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-		UParticleSystem* HitParticles;
+	UParticleSystem* HitParticles;
 
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
-		UAnimMontage* AttackMontage;
+	UAnimMontage* AttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
-		UAnimMontage* HitReactMontage;
+	UAnimMontage* HitReactMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = Combat)
-		UAnimMontage* DeathMontage;
+	UAnimMontage* DeathMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-		TArray<FName> AttackMontageSections;
+	TArray<FName> AttackMontageSections;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-		TArray<FName> DeathMontageSections;
+	TArray<FName> DeathMontageSections;
+
+public:
+	FORCEINLINE TEnumAsByte<EDeathPose> GetDeathPose() const { return DeathPose; }
 };

@@ -1,6 +1,24 @@
 #pragma once
 
 UENUM(BlueprintType)
+enum class ECharacterState : uint8
+{
+	ECS_Unequipped UMETA(DisplayName = "Unequipped"),
+	ECS_EquippedSword UMETA(DisplayName = "Equipped Sword"),
+	ECS_EquippedSpear UMETA(DisplayName = "Equipped Spear"),
+	ECS_EquippedAxe UMETA(DisplayName = "Equipped Axe")
+};
+
+UENUM(BlueprintType)
+enum class EActionState : uint8
+{
+	EAS_Unoccupied UMETA(DisplayName = "Unoccupied"),
+	EAS_HitReaction UMETA(DisplayName = "HitReaction"),
+	EAS_Attacking UMETA(DisplayName = "Attacking"),
+	EAS_EquippingWeapon UMETA(DisplayName = "Equpping Weapon")
+};
+
+UENUM(BlueprintType)
 enum EDeathPose
 {
 	EDP_Death1 UMETA(DisplayName = "Death1"),

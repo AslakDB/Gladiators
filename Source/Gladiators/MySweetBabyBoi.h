@@ -3,7 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Characters/BaseCharacter.h"
+#include "Characters/CharacterStates.h"
 #include "MySweetBabyBoi.generated.h"
 
 struct FInputActionValue;
@@ -13,16 +14,21 @@ class ASpear;
 class AAxe;
 class AHealthPotion;
 
+class AItem;
+class UAnimMontage;
+
 
 UCLASS()
-class GLADIATORS_API AMySweetBabyBoi : public ACharacter
+class GLADIATORS_API AMySweetBabyBoi : public ABaseCharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AMySweetBabyBoi();
-
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
 		class USpringArmComponent* SpringArm{ nullptr };
@@ -49,12 +55,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputMappingContext* MappingContext;
 
@@ -90,9 +91,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputAction* PauseGame;
 
+	/*TEST*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+	class UInputAction* FKeyAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	class UInputAction* AttackAction;
+
 
 	
-
 		bool GetIsAttack();
 
 		int MaxHealth;
@@ -250,5 +257,40 @@ public:
 
 	float Yaw;
 	float Pitch;
+
+protected:
+
+	void FKeyPressed();
+	//virtual void Attack() override;
+
+	/** Combat */
+	void EquipWeapon(AWeapon* Weapon);
+	virtual void AttackEnd() override;
+	virtual bool CanAttack() override;
+	bool CanDisarm();
+	bool CanArm();
+	void Disarm();
+	void Arm();
+	void PlayEquipMontage(const FName& SectionName);
+
+	UFUNCTION(BlueprintCallable)
+	void HitReactEnd();
+
+private:
+
+	UPROPERTY(VisibleInstanceOnly)
+	AItem* OverlappingItem;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* EquipMontage;
+
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState = EActionState::EAS_Unoccupied;
+
+public:
+	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
 };

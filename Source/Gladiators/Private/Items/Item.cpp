@@ -3,9 +3,8 @@
 
 #include "Items/Item.h"
 #include "Components/SphereComponent.h"
-//#include "Characters/Character.h"
+#include "Gladiators/MySweetBabyBoi.h"
 
-// Sets default values
 AItem::AItem()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -19,7 +18,6 @@ AItem::AItem()
 	Sphere->SetupAttachment(GetRootComponent());
 }
 
-// Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
@@ -40,20 +38,20 @@ float AItem::TransformedCos()
 
 void AItem::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	/*ANewCharacter* NewCharacter = Cast<ANewCharacter>(OtherActor);
-	if (NewCharacter)
+	AMySweetBabyBoi* MySweetBabyBoi = Cast<AMySweetBabyBoi>(OtherActor);
+	if (MySweetBabyBoi)
 	{
-		NewCharacter->SetOverlappingItem(this);
-	}*/
+		MySweetBabyBoi->SetOverlappingItem(this);
+	}
 }
 
 void AItem::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	/*ANewCharacter* NewCharacter = Cast<ANewCharacter>(OtherActor);
-	if (NewCharacter)
+	AMySweetBabyBoi* MySweetBabyBoi = Cast<AMySweetBabyBoi>(OtherActor);
+	if (MySweetBabyBoi)
 	{
-		NewCharacter->SetOverlappingItem(nullptr);
-	}*/
+		MySweetBabyBoi->SetOverlappingItem(nullptr);
+	}
 }
 
 void AItem::Tick(float DeltaTime)

@@ -31,8 +31,8 @@ AEnemy::AEnemy()
 	bUseControllerRotationRoll = false;
 
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
-	PawnSensing->SightRadius = 4000.f;
-	PawnSensing->SetPeripheralVisionAngle(45.f);
+	PawnSensing->SightRadius = 15000.f;
+	PawnSensing->SetPeripheralVisionAngle(170.f);
 
 	PauseMenu = CreateDefaultSubobject<UPauseMenuWidget>(TEXT("PauseMenu"));
 
@@ -86,16 +86,9 @@ void AEnemy::Destroyed()
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit)
 {
-	ShowHealthBar();
-
-	if (IsAlive())
-	{
-		DirectionalHitReact(ImpactPoint);
-	}
-	else Die();
-
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint, ActorHit);
+	if (!IsDead()) ShowHealthBar();
+	ClearPatrolTimer();
 }
 
 void AEnemy::BeginPlay()
