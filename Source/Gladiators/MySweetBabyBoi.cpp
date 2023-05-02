@@ -437,6 +437,7 @@ void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
 
 void AMySweetBabyBoi::Use(const FInputActionValue& input)
 {
+	
 	if (NearbySword.Num() > 0)
 	{
 		PickupSword();
