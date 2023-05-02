@@ -32,11 +32,14 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 	PrimaryActorTick.bCanEverTick = true;
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(GetRootComponent());
-	SpringArm->TargetArmLength = 400.f;
+	SpringArm->TargetArmLength = 600.f;
 	SpringArm->bUsePawnControlRotation = true;
+	SpringArm->bDoCollisionTest = true;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+	
+	
 
 	ColliderPickupWork = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	ColliderPickupWork->SetupAttachment(GetRootComponent());
@@ -162,6 +165,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(ForwardInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::Forward);
 		EnhanceInputCom->BindAction(RightInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::Right);
 		EnhanceInputCom->BindAction(AttackInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Attack);
+		EnhanceInputCom->BindAction(HeavyAttackInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::HeavyAttack);
 		EnhanceInputCom->BindAction(DodgeInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Dodge);
 		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::MouseX);
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::MouseY);
@@ -170,6 +174,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseX);
 		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseY);
 		EnhanceInputCom->BindAction(UseInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Use);
+
 		/*Code for input on open and close inventory*/
 		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::OpenInv);
 		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::OpenInv);
@@ -213,7 +218,8 @@ void AMySweetBabyBoi::PickupSword()
 	HaveSword = true;
 	HaveAxe = false;
 	HaveSpear = false;
-	UE_LOG(LogTemp, Warning, TEXT("U have le sword"));
+	GetSword();
+	
 }
 
 void AMySweetBabyBoi::PickupSpear()
@@ -224,6 +230,7 @@ void AMySweetBabyBoi::PickupSpear()
 	HaveSpear = true;
 	HaveSword = false;
 	HaveAxe = false;
+	GetSpear();
 }
 
 void AMySweetBabyBoi::PickupAxe()
@@ -234,6 +241,35 @@ void AMySweetBabyBoi::PickupAxe()
 	HaveAxe = true;
 	HaveSword = false;
 	HaveSpear = false;
+	GetAxe();
+	
+}
+
+void AMySweetBabyBoi::GetSword()
+{
+
+	SpawnSword = GetWorld()->SpawnActor<AActor>(Sword, FVector(0, 0, 0), FRotator(90, 0, 0));
+	if(SpawnSword)
+	SpawnSword->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Sword"));
+	
+
+	
+}
+
+void AMySweetBabyBoi::GetSpear()
+{
+	SpawnSpear = GetWorld()->SpawnActor<AActor>(Spear, FVector(0, 0, 0), FRotator(90, 0, 0));
+	if (SpawnSpear)
+		SpawnSpear->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Spear"));
+	
+	
+}
+
+void AMySweetBabyBoi::GetAxe()
+{
+	SpawnAxe = GetWorld()->SpawnActor<AActor>(Axe, FVector(0, 0, 0), FRotator(90, 0, 0));
+	if (SpawnAxe)
+		SpawnAxe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("Axe"));
 }
 
 
@@ -248,6 +284,10 @@ void AMySweetBabyBoi::ResetAttack()
 	SwordAttack = false;
 	AxeAttack = false;
 	SpearAttack = false;
+	HeavySwordAttack = false;
+	HeavyAxeAttack = false;
+	HeavySpearAttack = false;
+	
 }
 
 void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -271,6 +311,7 @@ void AMySweetBabyBoi::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AAc
 	if (OtherActor->IsA<ASword>())
 	{
 		NearbySword.Remove(Cast<ASword>(OtherActor));
+		
 	}
 	if(OtherActor->IsA<ASpear>())
 	{
@@ -318,6 +359,24 @@ void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 		SpearAttack = true;
 	}
 }
+
+void AMySweetBabyBoi::HeavyAttack(const FInputActionValue& input)
+{
+	IsAttack = true;
+	if (HaveSword)
+	{
+		HeavySwordAttack = true;
+	}
+	if (HaveAxe)
+	{
+		HeavyAxeAttack = true;
+	}
+	if (HaveSpear)
+	{
+		HeavySpearAttack = true;
+	}
+}
+
 
 void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
 {
