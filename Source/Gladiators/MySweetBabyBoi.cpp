@@ -12,6 +12,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameManager.h"
 #include "Components/SphereComponent.h"
+#include "BossWidget.h"
 
 #include "InventoryWidget.h"
 #include "Public/Hud/PauseMenuWidget.h"
@@ -19,11 +20,14 @@
 
 #include "PlayerUserWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "Enemy/Enemy.h"
+#include "Items/HealthPotion.h"
 
 
 #include "Items/Weapons/Spear.h"
 #include "Items/Weapons/Sword.h"
 #include "Items/Weapons/Axe.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AMySweetBabyBoi::AMySweetBabyBoi()
@@ -54,7 +58,12 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+	MaxHealth = 100;
+	Health = MaxHealth;
+
+	Enemy = CreateDefaultSubobject<AEnemy>(TEXT("Enemy"));
 	
+
 }
 
 // Called when the game starts or when spawned
@@ -93,6 +102,8 @@ void AMySweetBabyBoi::BeginPlay()
 		}
 
 		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
+		CyclopsWidget = CreateWidget<UBossWidget>(World, TCyclopsWidget);
+		ManticoreWidget = CreateWidget<UBossWidget>(World, TManticoreWidget);
 	}
 
 	if (InventoryWidget)
@@ -100,7 +111,7 @@ void AMySweetBabyBoi::BeginPlay()
 		InventoryWidget->InventoryCount = 0;
 	}
 
-
+	GameIsPaused = false;
 }
 
 // Called every frame
@@ -122,8 +133,14 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			}
 
 			// Pulled this out to its own function
+			Health -=1 * DeltaTime ;
 
 			Movement();
+
+			if (InventoryWidget)
+			{
+				InventoryWidget->ManageInventory();
+			}
 
 			AddControllerYawInput(Yaw);
 			AddControllerPitchInput(Pitch);
@@ -132,6 +149,21 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
 			PlayerController->SetShowMouseCursor(false);
 			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
+			UGameplayStatics::SetGamePaused(this, false);
+
+			if (Widget)
+			{
+
+				Widget->SetPlayerHealth(Health, MaxHealth);
+			}
+			if(CyclopsWidget && Enemy)
+			{
+			CyclopsWidget->SetBossHealth(Enemy->EnemyMaxHealth, Enemy->EnemyHealth);
+			}
+			if (ManticoreWidget && Enemy)
+			{
+			ManticoreWidget->SetBossHealth(Enemy->EnemyMaxHealth, Enemy->EnemyHealth);
+			}
 		}
 		
 		else
@@ -141,7 +173,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
 			PlayerController->SetShowMouseCursor(true);
 			UWidgetBlueprintLibrary::SetInputMode_UIOnlyEx(PlayerController, PauseWidget);
-		
+			UGameplayStatics::SetGamePaused(this, true);
 		}
 	}
 
@@ -272,6 +304,18 @@ void AMySweetBabyBoi::GetAxe()
 		SpawnAxe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("Axe"));
 }
 
+void AMySweetBabyBoi::PickupPotion()
+{
+	if (InventoryWidget && InventoryWidget->InventoryCount != 3)
+	{
+	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Picking up potions"));
+	AHealthPotion* PotionToDestroy = Potions[0];
+	Potions.RemoveAt(0);
+	PotionToDestroy->Pickup();
+		InventoryWidget->InventoryCount++;
+	}
+}
+
 
 bool AMySweetBabyBoi::GetIsAttack()
 {
@@ -304,6 +348,10 @@ void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	{
 		NearbyAxe.Add(Cast<AAxe>(OtherActor));
 	}
+	if (OtherActor->IsA<AHealthPotion>())
+	{
+		Potions.Add(Cast<AHealthPotion>(OtherActor));
+	}
 }
 
 void AMySweetBabyBoi::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
@@ -320,6 +368,10 @@ void AMySweetBabyBoi::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AAc
 	if(OtherActor->IsA<AAxe>())
 	{
 		NearbyAxe.Remove(Cast<AAxe>(OtherActor));
+	}
+	if (OtherActor->IsA<AHealthPotion>())
+	{
+		Potions.Remove(Cast<AHealthPotion>(OtherActor));
 	}
 }
 
@@ -396,8 +448,21 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 	}
 	if (NearbyAxe.Num() > 0)
 	{
+		GEngine->AddOnScreenDebugMessage(9, 8, FColor::Magenta, TEXT("Axe is nearby"));
+
 		PickupAxe();
 		return;
+	}
+	if (Potions.Num() > 0)
+	{
+		GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Potions nearby"));
+
+		PickupPotion();
+	}
+	if (InventoryWidget->IsInViewport() && InventoryWidget->InventoryCount !=0)
+	{
+		Health = MaxHealth;
+		InventoryWidget->InventoryCount--;
 	}
 }
 
@@ -407,6 +472,7 @@ void AMySweetBabyBoi::OpenInv(const FInputActionValue& input)
 	{
 		InventoryWidget->AddToViewport(1);
 	}
+	
 }
 
 void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
@@ -424,6 +490,8 @@ void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
 			if (!PauseWidget->Paused)
 			{
 				PauseWidget->Paused = true;
+				GEngine->AddOnScreenDebugMessage(3, 6, FColor::Blue, TEXT("P pressed"));
+				GameIsPaused = true;
 			}
 
 		}

@@ -9,6 +9,7 @@
 
 class UHealthBarComponent;
 class UPawnSensingComponent;
+class AMySweetBabyBoi;
 
 UCLASS()
 class GLADIATORS_API AEnemy : public ABaseCharacter
@@ -27,6 +28,16 @@ public:
 	/** <IHitInterface */
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
 	/** </IHitInterface */
+
+	/*For pause*/
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		class UPauseMenuWidget* PauseMenu;
+
+	/*values of health*/
+	UPROPERTY()
+		int EnemyHealth;
+	UPROPERTY()
+		int EnemyMaxHealth;
 
 protected:
 	/** <AActor> */
@@ -133,3 +144,5 @@ private:
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float DeathLifeSpan = 8.f;
 };
+
+
