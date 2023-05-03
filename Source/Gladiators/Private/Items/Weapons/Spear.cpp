@@ -42,8 +42,7 @@ void ASpear::SpearOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActo
 
 void ASpear::Pickup()
 {
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
+	//SetActorHiddenInGame(true);
 	Destroy();
 }
 
