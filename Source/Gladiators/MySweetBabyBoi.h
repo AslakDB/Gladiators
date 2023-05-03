@@ -33,14 +33,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
 		class USphereComponent* ColliderPickupWork;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
-		class UStaticMeshComponent* Mesh1;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
-		class UStaticMeshComponent* MeshSword;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
-		class UStaticMeshComponent* MeshSpear;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
-		class UStaticMeshComponent* MeshAxe;
+	
 
 	
 
@@ -124,12 +117,16 @@ public:
 		void GetAxe();
 
 	UFUNCTION()
+		void RemoveSpear();
+
+	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex,
 			bool bFromSweep, const FHitResult& SweepResult);
+
 	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
+		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<ASword*> NearbySword;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
@@ -138,6 +135,14 @@ public:
 		TArray<AAxe*> NearbyAxe;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<AHealthPotion*> Potions;
+
+	UPROPERTY()
+		ASword* SwordRef;
+
+	UPROPERTY()
+		AActor* SpearRef;
+	UPROPERTY()
+		AAxe* AxeRef;
 
 private:
 	void Forward(const FInputActionValue& input);
@@ -159,6 +164,8 @@ private:
 	void PickupSpear();
 	void PickupAxe();
 	void PickupPotion();
+
+	
 
 	
 
@@ -196,18 +203,18 @@ public:
 		class AEnemy* Enemy;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		AActor* SpawnSword = nullptr;
+		ASword* SpawnSword = nullptr;
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ASword> Sword;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		AActor* SpawnSpear = nullptr;
+		ASpear* SpawnSpear = nullptr;
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ASpear>Spear;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		AActor* SpawnAxe = nullptr;
+		AAxe* SpawnAxe = nullptr;
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class AAxe>Axe;

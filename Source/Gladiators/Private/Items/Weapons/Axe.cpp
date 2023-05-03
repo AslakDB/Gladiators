@@ -40,8 +40,6 @@ void AAxe::AxeOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 void AAxe::Pickup()
 {
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
 	Destroy();
 }
 
