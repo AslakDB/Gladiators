@@ -46,6 +46,7 @@ protected:
 
 	/** <ABaseCharacter> */
 	virtual void Die() override;
+	void SpawnHealthPotion();
 	virtual void Attack() override;
 	virtual bool CanAttack() override;
 	virtual void AttackEnd() override;
@@ -92,17 +93,29 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensing;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Combat)
 	TSubclassOf<class AWeapon> WeaponClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ASword> SwordClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ASpear> SpearClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AAxe> AxeClass;
 
 	UPROPERTY()
 	AActor* CombatTarget;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Combat)
 	double CombatRadius = 500.f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Combat)
 	double AttackRadius = 150.f;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	double AcceptanceRadius = 50.f;
 
 	UPROPERTY()
 	class AAIController* EnemyController;
@@ -141,6 +154,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float DeathLifeSpan = 3.5;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<class AHealthPotion> HealthPotionClass;
 };
 
 

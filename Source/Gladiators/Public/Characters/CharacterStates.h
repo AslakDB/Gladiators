@@ -4,7 +4,7 @@ UENUM(BlueprintType)
 enum class ECharacterState : uint8
 {
 	ECS_Unequipped UMETA(DisplayName = "Unequipped"),
-	ECS_EquippedSword UMETA(DisplayName = "Equipped Sword"),
+	ECS_EquippedWeapon UMETA(DisplayName = "Equipped Weapon"),
 	ECS_EquippedSpear UMETA(DisplayName = "Equipped Spear"),
 	ECS_EquippedAxe UMETA(DisplayName = "Equipped Axe")
 };

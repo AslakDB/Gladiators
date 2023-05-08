@@ -4,6 +4,9 @@
 #include "Characters/BaseCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Items/Weapons/Weapon.h"
+#include "Items/Weapons/Sword.h"
+#include "Items/Weapons/Spear.h"
+#include "Items/Weapons/Axe.h"
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -30,8 +33,8 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* A
 	}
 	else Die();
 
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+	//PlayHitSound(ImpactPoint);
+	//SpawnHitParticles(ImpactPoint);
 }
 
 void ABaseCharacter::Attack()
@@ -196,6 +199,24 @@ void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collision
 	{
 		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
 		EquippedWeapon->IgnoreActors.Empty();
+	}
+
+	if (EquippedSword && EquippedSword->GetWeaponBox())
+	{
+		EquippedSword->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedSword->IgnoreActors.Empty();
+	}
+
+	if (EquippedSpear && EquippedSpear->GetWeaponBox())
+	{
+		EquippedSpear->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedSpear->IgnoreActors.Empty();
+	}
+
+	if (EquippedAxe && EquippedAxe->GetWeaponBox())
+	{
+		EquippedAxe->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
+		EquippedAxe->IgnoreActors.Empty();
 	}
 }
 
