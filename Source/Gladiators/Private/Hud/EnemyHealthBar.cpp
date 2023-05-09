@@ -4,10 +4,4 @@
 #include "Hud/EnemyHealthBar.h"
 #include "Components/ProgressBar.h"
 
-void UEnemyHealthBar::SetEnemyHealth(float CurrentHealth, float MaxHealth)
-{
-	if (EnemyHealthBar)
-	{
-		EnemyHealthBar->SetPercent(CurrentHealth/ MaxHealth);
-	}
-}
+

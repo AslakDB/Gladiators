@@ -39,6 +39,13 @@ public:
 	UPROPERTY()
 		int EnemyMaxHealth;
 
+	
+
+	UPROPERTY(EditAnywhere)
+		ACharacter* Player = nullptr;
+
+	/*UPROPERTY(EditAnywhere)
+		TSubclassOf<ACharacter> TPlayer*/;
 protected:
 	/** <AActor> */
 	virtual void BeginPlay() override;
@@ -46,6 +53,7 @@ protected:
 
 	/** <ABaseCharacter> */
 	virtual void Die() override;
+	void SpawnHealthPotion();
 	virtual void Attack() override;
 	virtual bool CanAttack() override;
 	virtual void AttackEnd() override;
@@ -54,12 +62,10 @@ protected:
 	/** </ABaseCharacter> */
 
 	UPROPERTY(BlueprintReadOnly)
-	TEnumAsByte<EDeathPose> DeathPose;
-
-	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
 private:
+
 	/** AI Behavior */
 	void InitializeEnemy();
 	void CheckPatrolTarget();
@@ -88,23 +94,35 @@ private:
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn); // Callback for OnPawnSeen in UPawnSensingComponent
 
-	/*UPROPERTY(VisibleAnywhere)
-	UHealthBarComponent* HealthBarWidget;*/
+	UPROPERTY(VisibleAnywhere)
+	UHealthBarComponent* HealthBarWidget;
 
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensing;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Combat)
 	TSubclassOf<class AWeapon> WeaponClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ASword> SwordClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ASpear> SpearClass;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AAxe> AxeClass;
 
 	UPROPERTY()
 	AActor* CombatTarget;
 
-	UPROPERTY(EditAnywhere)
-	double CombatRadius = 1000.f;
+	UPROPERTY(EditAnywhere, Category = Combat)
+	double CombatRadius = 500.f;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = Combat)
 	double AttackRadius = 150.f;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	double AcceptanceRadius = 50.f;
 
 	UPROPERTY()
 	class AAIController* EnemyController;
@@ -142,7 +160,10 @@ private:
 	float ChasingSpeed = 300.f;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	float DeathLifeSpan = 8.f;
+	float DeathLifeSpan = 3.5;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<class AHealthPotion> HealthPotionClass;
 };
 
 
