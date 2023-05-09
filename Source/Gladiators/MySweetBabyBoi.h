@@ -162,9 +162,9 @@ private:
 
 
 	void Movement();
-	void PickupSword();
-	void PickupSpear();
-	void PickupAxe();
+	void PickupSword(ASword* SwordEquipped);
+	void PickupSpear(ASpear* SpearEquipped);
+	void PickupAxe(AAxe* AxeEquipped);
 	void PickupPotion();
 
 	
@@ -202,14 +202,15 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		AActor* SpawnSpear = nullptr;
+
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<class ASpear>Spear;
+		TSubclassOf<class ASpear> Spear;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		AActor* SpawnAxe = nullptr;
 
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<class AAxe>Axe;
+		TSubclassOf<class AAxe> Axe;
 
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		AActor* Potions = nullptr;*/
@@ -257,6 +258,9 @@ protected:
 
 	/** Combat */
 	void EquipWeapon(AWeapon* Weapon);
+	void EquipSword(ASword* SwordEquip);
+	void EquipSpear(ASpear* SpearEquip);
+	void EquipAxe(AAxe* AxeEquip);
 	virtual void AttackEnd() override;
 	virtual bool CanAttack() override;
 	bool CanDisarm();
@@ -277,6 +281,18 @@ private:
 
 	UPROPERTY()
 		TSubclassOf<UHealthBarComponent> THealthBarWidget;
+	void SpawnDefaultSword();
+	void SpawnDefaultSpear();
+	void SpawnDefaultAxe();
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<class AWeapon> SwordClass;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<class AWeapon> SpearClass;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<class AWeapon> AxeClass;
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;

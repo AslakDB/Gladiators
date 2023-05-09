@@ -11,6 +11,8 @@
 #include "Hud/PauseMenuWidget.h"
 #include "Gladiators/MySweetBabyBoi.h"
 #include "Items/Weapons/Weapon.h"
+#include "Items/Weapons/Sword.h"
+#include "Items/HealthPotion.h"
 #include "EngineUtils.h"
 #include "Hud/EnemyHealthBar.h"
 #include "Components/WidgetComponent.h"
@@ -147,6 +149,22 @@ void AEnemy::Die()
 	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+	SpawnHealthPotion();
+}
+
+void AEnemy::SpawnHealthPotion()
+{
+	UWorld* World = GetWorld();
+	if (World && HealthPotionClass && Attributes)
+	{
+		const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 0.f);
+		AHealthPotion* SpawnedHealthPotion = World->SpawnActor<AHealthPotion>(HealthPotionClass, SpawnLocation, GetActorRotation());
+		if (SpawnedHealthPotion)
+		{
+			SpawnedHealthPotion->SetHealthPotions(Attributes->GetHealthPotions());
+			SpawnedHealthPotion->SetOwner(this);
+		}
+	}
 }
 
 void AEnemy::Attack()
@@ -337,7 +355,7 @@ void AEnemy::MoveToTarget(AActor* Target)
 	if (EnemyController == nullptr || Target == nullptr) return;
 	FAIMoveRequest MoveRequest;
 	MoveRequest.SetGoalActor(Target);
-	MoveRequest.SetAcceptanceRadius(50.f);
+	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
 	EnemyController->MoveTo(MoveRequest);
 }
 
@@ -368,7 +386,7 @@ void AEnemy::SpawnDefaultWeapon()
 	if (World && WeaponClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
-		DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("WeaponSocket"), this, this);
 		EquippedWeapon = DefaultWeapon;
 	}
 }

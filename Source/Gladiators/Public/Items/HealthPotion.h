@@ -35,4 +35,12 @@ public:
 
 	UFUNCTION()
 		void Pickup();
+
+private:
+
+	UPROPERTY(EditAnywhere, Category = "HealthPotion Properties")
+	int32 HealthPotions;
+public:
+	FORCEINLINE int32 GetHealthPotions() const { return HealthPotions; }
+	FORCEINLINE void SetHealthPotions(int32 NumberOfHealthPotions) { HealthPotions = NumberOfHealthPotions;  }
 };

@@ -9,6 +9,9 @@
 #include "BaseCharacter.generated.h"
 
 class AWeapon;
+class ASword;
+class ASpear;
+class AAxe;
 class UAttributeComponent;
 class UAnimMontage;
 
@@ -49,6 +52,15 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	AWeapon* EquippedWeapon;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	ASword* EquippedSword;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	ASpear* EquippedSpear;
+
+	UPROPERTY(VisibleAnywhere, Category = Weapon)
+	AAxe* EquippedAxe;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAttributeComponent* Attributes;

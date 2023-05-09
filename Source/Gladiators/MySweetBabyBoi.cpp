@@ -90,6 +90,7 @@ void AMySweetBabyBoi::BeginPlay()
 
 	Tags.Add(FName("EngagableTarget"));
 
+
 	GetCharacterMovement()->MaxWalkSpeed = 330.f;
 
 	// Add the mapping context
@@ -240,8 +241,8 @@ void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 	ActionState = EActionState::EAS_HitReaction;
 
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+	//PlayHitSound(ImpactPoint);
+	//SpawnHitParticles(ImpactPoint);
 }
 
 void AMySweetBabyBoi::Movement()
@@ -270,7 +271,7 @@ void AMySweetBabyBoi::Movement()
 	}
 }
 
-void AMySweetBabyBoi::PickupSword()
+void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 {
 	ASword* ItemToDestroy = NearbySword[0];
 	NearbySword.RemoveAt(0);
@@ -279,10 +280,15 @@ void AMySweetBabyBoi::PickupSword()
 	HaveAxe = false;
 	HaveSpear = false;
 	GetSword();
-	
+
+	//SwordEquipped->SetOwner(this);
+	//SwordEquipped->SetInstigator(this);
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+	OverlappingItem = nullptr;
+	EquippedSword = SwordEquipped;
 }
 
-void AMySweetBabyBoi::PickupSpear()
+void AMySweetBabyBoi::PickupSpear(ASpear* SpearEquipped)
 {
 	ASpear* SpearToDestroy = NearbySpear[0];
 	NearbySpear.RemoveAt(0);
@@ -291,9 +297,13 @@ void AMySweetBabyBoi::PickupSpear()
 	HaveSword = false;
 	HaveAxe = false;
 	GetSpear();
+
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+	OverlappingItem = nullptr;
+	EquippedSpear = SpearEquipped;
 }
 
-void AMySweetBabyBoi::PickupAxe()
+void AMySweetBabyBoi::PickupAxe(AAxe* AxeEquipped)
 {
 	AAxe* AxeToDestroy = NearbyAxe[0];
 	NearbyAxe.RemoveAt(0);
@@ -303,6 +313,9 @@ void AMySweetBabyBoi::PickupAxe()
 	HaveSpear = false;
 	GetAxe();
 	
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+	OverlappingItem = nullptr;
+	EquippedAxe = AxeEquipped;
 }
 
 void AMySweetBabyBoi::GetSword()
@@ -429,18 +442,21 @@ void AMySweetBabyBoi::MouseY(const FInputActionValue& input)
 
 void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 {
-	IsAttack = true;
-	if(HaveSword)
+	if (CanAttack())
 	{
-		SwordAttack = true;
-	}
-	if(HaveAxe)
-	{
-		AxeAttack = true;
-	}
-	if(HaveSpear)
-	{
-		SpearAttack = true;
+		IsAttack = true;
+		if (HaveSword)
+		{
+			SwordAttack = true;
+		}
+		if (HaveAxe)
+		{
+			AxeAttack = true;
+		}
+		if (HaveSpear)
+		{
+			SpearAttack = true;
+		}
 	}
 }
 
@@ -468,21 +484,28 @@ void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
 
 void AMySweetBabyBoi::Use(const FInputActionValue& input)
 {
+	ASword* OverlappingSword = Cast<ASword>(OverlappingItem);
+	ASpear* OverlappingSpear = Cast<ASpear>(OverlappingItem);
+	AAxe* OverlappingAxe = Cast<AAxe>(OverlappingItem);
+
 	if (NearbySword.Num() > 0)
 	{
-		PickupSword();
+		PickupSword(OverlappingSword);
+		SpawnDefaultSword();
 		return;
 	}
 	if (NearbySpear.Num() > 0)
 	{
-		PickupSpear();
+		PickupSpear(OverlappingSpear);
+		SpawnDefaultSpear();
 		return;
 	}
 	if (NearbyAxe.Num() > 0)
 	{
 		GEngine->AddOnScreenDebugMessage(9, 8, FColor::Magenta, TEXT("Axe is nearby"));
 
-		PickupAxe();
+		PickupAxe(OverlappingAxe);
+		SpawnDefaultAxe();
 		return;
 	}
 	if (Potions.Num() > 0)
@@ -531,10 +554,27 @@ void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 
 void AMySweetBabyBoi::FKeyPressed()
 {
-	AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	/*AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
 	if (OverlappingWeapon)
 	{
 		EquipWeapon(OverlappingWeapon);
+	}
+	else
+	{
+		if (CanDisarm())
+		{
+			Disarm();
+		}
+		else if (CanArm())
+		{
+			Arm();
+		}
+	}*/
+
+	ASword* OverlappingSword = Cast<ASword>(OverlappingItem);
+	if (OverlappingSword)
+	{
+		EquipSword(OverlappingSword);
 	}
 	else
 	{
@@ -552,19 +592,41 @@ void AMySweetBabyBoi::FKeyPressed()
 //void AMySweetBabyBoi::Attack()
 //{
 //	Super::Attack();
-//	if (CanAttack())
+//	/*if (CanAttack())
 //	{
 //		PlayAttackMontage();
 //		ActionState = EActionState::EAS_Attacking;
+//	}*/
+//
+//	IsAttack = true;
+//	if (HaveSword)
+//	{
+//		SwordAttack = true;
+//	}
+//	if (HaveAxe)
+//	{
+//		AxeAttack = true;
+//	}
+//	if (HaveSpear)
+//	{
+//		SpearAttack = true;
 //	}
 //}
 
 void AMySweetBabyBoi::EquipWeapon(AWeapon* Weapon)
 {
-	Weapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
-	CharacterState = ECharacterState::ECS_EquippedSword;
+	Weapon->Equip(GetMesh(), FName("Sword"), this, this);
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedWeapon = Weapon;
+}
+
+void AMySweetBabyBoi::EquipSword(ASword* SwordEquip)
+{
+	SwordEquip->Equip(GetMesh(), FName("Sword"), this, this);
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+	OverlappingItem = nullptr;
+	EquippedSword = SwordEquip;
 }
 
 void AMySweetBabyBoi::AttackEnd()
@@ -600,7 +662,7 @@ void AMySweetBabyBoi::Disarm()
 void AMySweetBabyBoi::Arm()
 {
 	PlayEquipMontage(FName("Equip"));
-	CharacterState = ECharacterState::ECS_EquippedSword;
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
 }
 
 void AMySweetBabyBoi::PlayEquipMontage(const FName& SectionName)
@@ -624,5 +686,35 @@ void AMySweetBabyBoi::HandleDamage(float DamageAmount)
 	if (Attributes && HealthBarWidget)
 	{
 		HealthBarWidget->SetHealthBarPercent(Attributes->GetHealthPercent());
+void AMySweetBabyBoi::SpawnDefaultSword()
+{
+	UWorld* World = GetWorld();
+	if (World && SwordClass)
+	{
+		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(SwordClass);
+		DefaultWeapon->Equip(GetMesh(), FName("SwordSocket"), this, this);
+		EquippedWeapon = DefaultWeapon;
+	}
+}
+
+void AMySweetBabyBoi::SpawnDefaultSpear()
+{
+	UWorld* World = GetWorld();
+	if (World && SpearClass)
+	{
+		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(SpearClass);
+		DefaultWeapon->Equip(GetMesh(), FName("SpearSocket"), this, this);
+		EquippedWeapon = DefaultWeapon;
+	}
+}
+
+void AMySweetBabyBoi::SpawnDefaultAxe()
+{
+	UWorld* World = GetWorld();
+	if (World && AxeClass)
+	{
+		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(AxeClass);
+		DefaultWeapon->Equip(GetMesh(), FName("AxeSocket"), this, this);
+		EquippedWeapon = DefaultWeapon;
 	}
 }
