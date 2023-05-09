@@ -14,6 +14,7 @@
 #include "Components/SphereComponent.h"
 #include "BossWidget.h"
 #include "Public/Enemy/Enemy.h"
+#include "Engine/EngineTypes.h"
 
 #include "InventoryWidget.h"
 #include "Public/Hud/PauseMenuWidget.h"
@@ -59,6 +60,8 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 
 	MaxHealth = 100;
 	Health = MaxHealth;
+	DodgeCooldownTime = 2.f;
+	DodgeDistance = 500;
 
 	Enemy = CreateDefaultSubobject<AEnemy>(TEXT("Enemy"));
 	
@@ -69,6 +72,8 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 void AMySweetBabyBoi::BeginPlay()
 {
 	Super::BeginPlay();
+
+	
 
 	Tags.Add(FName("EngagableTarget"));
 
@@ -117,6 +122,8 @@ void AMySweetBabyBoi::BeginPlay()
 void AMySweetBabyBoi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	DodgeCooldown -= DeltaTime;
+	
 
 	if (PauseWidget)
 	{
@@ -218,6 +225,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	}
 }
 
+
 void AMySweetBabyBoi::Movement()
 {
 	//Movement
@@ -241,6 +249,43 @@ void AMySweetBabyBoi::Movement()
 	{
 		AddMovementInput(RightVector);
 	}
+}
+
+void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
+{
+
+	//if (DodgeCooldown <= 0.f)
+	//{
+	//	// Reset the dodge cooldown
+	//	DodgeCooldown = DodgeCooldownTime;
+
+	//	// Get the character's movement component
+	//	UCharacterMovementComponent* movementComponent = GetCharacterMovement();
+
+	//	if (movementComponent)
+	//	{
+	//		// Set the movement mode to flying to allow for more agile movement
+	//		movementComponent->SetMovementMode(MOVE_Flying);
+
+	//		// Apply movement input in the dodge direction
+	//		FVector movementInput = DodgeDirection * DodgeDistance;
+	//		movementComponent->AddInputVector(movementInput);
+	//	}
+	//	
+	//}
+	//
+	//GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Dodge Called"));
+
+
+}
+
+void AMySweetBabyBoi::DodgeReset()
+{
+
+	/*UCharacterMovementComponent* movementComp = GetCharacterMovement();
+
+	movementComp->StopMovementImmediately();
+	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Koffer stoppa du ikke"));*/
 }
 
 void AMySweetBabyBoi::PickupSword()
@@ -359,10 +404,6 @@ void AMySweetBabyBoi::GetAxe()
 	HaveSpear = false;
 }
 
-void AMySweetBabyBoi::RemoveSpear()
-{
-	
-}
 
 void AMySweetBabyBoi::PickupPotion()
 {
@@ -492,10 +533,6 @@ void AMySweetBabyBoi::HeavyAttack(const FInputActionValue& input)
 	}
 }
 
-
-void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
-{
-}
 
 void AMySweetBabyBoi::Use(const FInputActionValue& input)
 {

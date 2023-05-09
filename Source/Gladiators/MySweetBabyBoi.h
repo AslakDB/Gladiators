@@ -7,6 +7,7 @@
 #include "MySweetBabyBoi.generated.h"
 
 struct FInputActionValue;
+struct FTimerHandle;
 class UItems;
 class ASword;
 class ASpear;
@@ -116,8 +117,6 @@ public:
 	UFUNCTION()
 		void GetAxe();
 
-	UFUNCTION()
-		void RemoveSpear();
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
@@ -139,10 +138,7 @@ public:
 	UPROPERTY()
 		ASword* SwordRef;
 
-	UPROPERTY()
-		AActor* SpearRef;
-	UPROPERTY()
-		AAxe* AxeRef;
+
 
 private:
 	void Forward(const FInputActionValue& input);
@@ -158,7 +154,7 @@ private:
 	void CloseInv(const FInputActionValue& input);
 	void PausedGame(const FInputActionValue& input);
 
-
+	void DodgeReset();
 	void Movement();
 	void PickupSword();
 	void PickupSpear();
@@ -219,8 +215,7 @@ public:
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class AAxe>Axe;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		AActor* Potions = nullptr;*/
+	
 
 	
 
@@ -254,6 +249,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		bool HaveSpear;
 
+	bool IsDodging;
+	float DodgeDistance;
+	float DodgeCooldown;
+	float DodgeCooldownTime;
+	FVector DodgeDirection;
 
 	float Yaw;
 	float Pitch;
