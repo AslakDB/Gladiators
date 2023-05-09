@@ -7,11 +7,15 @@
 #include "Gameframework/CharacterMovementComponent.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
-//#include "HUD/HealthBarComponent.h"
+#include "Hud/Health/HealthBarComponent.h"
 #include "Hud/PauseMenuWidget.h"
 #include "Gladiators/MySweetBabyBoi.h"
 #include "Items/Weapons/Weapon.h"
 #include "EngineUtils.h"
+#include "Hud/EnemyHealthBar.h"
+#include "Components/WidgetComponent.h"
+#include "Hud/Health/HealthBarComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AEnemy::AEnemy()
 {
@@ -22,8 +26,10 @@ AEnemy::AEnemy()
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
-	/*HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
-	HealthBarWidget->SetupAttachment(GetRootComponent());*/
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
+	 
+
+		
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;
@@ -44,6 +50,30 @@ void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	if(GetWorld())
+	{
+		if (Player)
+		{
+			GEngine->AddOnScreenDebugMessage(1, 1, FColor::Yellow, TEXT("Player is real"));
+			FVector PlayerLocation = Player->GetActorLocation();
+			FVector Location = GetActorLocation();
+			float Distance = FVector::Distance(Location, PlayerLocation);
+			
+			
+			if (Distance < 1000)
+			{
+				HealthBarWidget->SetVisibility(true);
+			}
+			else
+			{
+				HealthBarWidget->SetVisibility(false);
+				
+			}
+		}
+		
+	
+	}
+
 		
 			GetCharacterMovement()->MaxWalkSpeed = 300;
 			if (IsDead()) return;
@@ -101,6 +131,7 @@ void AEnemy::BeginPlay()
 		Player = Cast<AMySweetBabyBoi>(AllPlayers[i]);
 	}*/
 
+	Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	InitializeEnemy();
 	Tags.Add(FName("Enemy"));
@@ -147,10 +178,10 @@ void AEnemy::HandleDamage(float DamageAmount)
 {
 	Super::HandleDamage(DamageAmount);
 
-	/*if (Attributes && HealthBarWidget)
+	if (Attributes && HealthBarWidget)
 	{
-		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
-	}*/
+		HealthBarWidget->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
 }
 
 int32 AEnemy::PlayDeathMontage()

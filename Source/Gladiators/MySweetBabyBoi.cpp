@@ -18,6 +18,7 @@
 #include "InventoryWidget.h"
 #include "Public/Hud/PauseMenuWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Public/Hud/Health/HealthBarComponent.h"
 
 #include "PlayerUserWidget.h"
 #include "Blueprint/UserWidget.h"
@@ -35,6 +36,7 @@
 #include "Items/Item.h"
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
+#include "Components/AttributeComponent.h"
 
 // Sets default values
 AMySweetBabyBoi::AMySweetBabyBoi()
@@ -50,7 +52,7 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 	
-	
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 
 	ColliderPickupWork = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	ColliderPickupWork->SetupAttachment(GetRootComponent());
@@ -84,6 +86,8 @@ void AMySweetBabyBoi::BeginPlay()
 {
 	Super::BeginPlay();
 
+
+
 	Tags.Add(FName("EngagableTarget"));
 
 	GetCharacterMovement()->MaxWalkSpeed = 330.f;
@@ -102,11 +106,11 @@ void AMySweetBabyBoi::BeginPlay()
 
 	if (UWorld* World = GetWorld())
 	{
-		Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
+		/*Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
 		if (Widget)
 		{
 			Widget->AddToViewport(2);
-		}
+		}*/
 
 		PauseWidget = CreateWidget<UPauseMenuWidget>(World, TPauseWidget);
 		if (PauseWidget)
@@ -115,8 +119,8 @@ void AMySweetBabyBoi::BeginPlay()
 		}
 
 		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
-		CyclopsWidget = CreateWidget<UBossWidget>(World, TCyclopsWidget);
-		ManticoreWidget = CreateWidget<UBossWidget>(World, TManticoreWidget);
+		/*CyclopsWidget = CreateWidget<UBossWidget>(World, TCyclopsWidget);
+		ManticoreWidget = CreateWidget<UBossWidget>(World, TManticoreWidget);*/
 	}
 
 	if (InventoryWidget)
@@ -145,8 +149,10 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 				GetCharacterMovement()->bOrientRotationToMovement = true;
 			}
 
+			//Widget->SetPlayerHealth(Health,MaxHealth);
+
 			// Pulled this out to its own function
-			Health -=1 * DeltaTime ;
+			//Health -=1 * DeltaTime ;
 
 			Movement();
 
@@ -164,19 +170,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
 			UGameplayStatics::SetGamePaused(this, false);
 
-			if (Widget)
-			{
-
-				Widget->SetPlayerHealth(Health, MaxHealth);
-			}
-			if(CyclopsWidget && Enemy)
-			{
-			CyclopsWidget->SetBossHealth(Enemy->EnemyMaxHealth, Enemy->EnemyHealth);
-			}
-			if (ManticoreWidget && Enemy)
-			{
-			ManticoreWidget->SetBossHealth(Enemy->EnemyMaxHealth, Enemy->EnemyHealth);
-			}
+			
 		}
 		
 		else
@@ -232,8 +226,11 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 float AMySweetBabyBoi::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	Health -= DamageAmount;
+	
 	HandleDamage(DamageAmount);
 	return DamageAmount;
+	
 }
 
 void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit)
@@ -345,6 +342,11 @@ void AMySweetBabyBoi::PickupPotion()
 	PotionToDestroy->Pickup();
 		InventoryWidget->InventoryCount++;
 	}
+}
+
+void AMySweetBabyBoi::SweetDeath()
+{
+	GEngine->AddOnScreenDebugMessage(5, 5, FColor::Emerald, TEXT("ThePlayerIsDead"));
 }
 
 bool AMySweetBabyBoi::GetIsAttack()
@@ -614,4 +616,13 @@ void AMySweetBabyBoi::PlayEquipMontage(const FName& SectionName)
 void AMySweetBabyBoi::HitReactEnd()
 {
 	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void AMySweetBabyBoi::HandleDamage(float DamageAmount)
+{
+	Super::HandleDamage(DamageAmount);
+	if (Attributes && HealthBarWidget)
+	{
+		HealthBarWidget->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
 }

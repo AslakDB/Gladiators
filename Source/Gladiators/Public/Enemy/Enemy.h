@@ -39,6 +39,13 @@ public:
 	UPROPERTY()
 		int EnemyMaxHealth;
 
+	
+
+	UPROPERTY(EditAnywhere)
+		ACharacter* Player = nullptr;
+
+	/*UPROPERTY(EditAnywhere)
+		TSubclassOf<ACharacter> TPlayer*/;
 protected:
 	/** <AActor> */
 	virtual void BeginPlay() override;
@@ -86,8 +93,8 @@ private:
 	UFUNCTION()
 	void PawnSeen(APawn* SeenPawn); // Callback for OnPawnSeen in UPawnSensingComponent
 
-	/*UPROPERTY(VisibleAnywhere)
-	UHealthBarComponent* HealthBarWidget;*/
+	UPROPERTY(VisibleAnywhere)
+	UHealthBarComponent* HealthBarWidget;
 
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensing;

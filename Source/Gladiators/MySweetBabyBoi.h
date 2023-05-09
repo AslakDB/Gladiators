@@ -172,11 +172,13 @@ private:
 
 public:
 
+	UFUNCTION(BlueprintCallable)
+		void SweetDeath();
 
-	UPROPERTY(VisibleAnywhere)
+	/*UPROPERTY(VisibleAnywhere)
 		class UPlayerUserWidget* Widget = nullptr;
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<UPlayerUserWidget> TWidget;
+		TSubclassOf<UPlayerUserWidget> TWidget;*/
 
 	UPROPERTY(VisibleAnywhere)
 		class UInventoryWidget* InventoryWidget = nullptr;
@@ -187,17 +189,7 @@ public:
 		class UPauseMenuWidget* PauseWidget = nullptr;
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UPauseMenuWidget> TPauseWidget;
-
-	UPROPERTY(VisibleAnywhere)
-		class UBossWidget* CyclopsWidget = nullptr;
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<UBossWidget> TCyclopsWidget;
-
-	UPROPERTY(VisibleAnywhere)
-		class UBossWidget* ManticoreWidget = nullptr;
-
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<UBossWidget> TManticoreWidget;
+	;
 
 	UPROPERTY(VisibleAnywhere)
 		class AEnemy* Enemy;
@@ -276,7 +268,15 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HitReactEnd();
 
+	virtual void HandleDamage(float DamageAmount) override; 
+
 private:
+
+	UPROPERTY(VisibleAnywhere)
+		class UHealthBarComponent* HealthBarWidget;
+
+	UPROPERTY()
+		TSubclassOf<UHealthBarComponent> THealthBarWidget;
 
 	UPROPERTY(VisibleInstanceOnly)
 	AItem* OverlappingItem;
