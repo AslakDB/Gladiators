@@ -686,6 +686,9 @@ void AMySweetBabyBoi::HandleDamage(float DamageAmount)
 	if (Attributes && HealthBarWidget)
 	{
 		HealthBarWidget->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
+}
+
 void AMySweetBabyBoi::SpawnDefaultSword()
 {
 	UWorld* World = GetWorld();

@@ -29,9 +29,7 @@ AEnemy::AEnemy()
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
-	 
-
-		
+	//HealthBarWidget->SetupAttachment(GetRootComponent());
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;
