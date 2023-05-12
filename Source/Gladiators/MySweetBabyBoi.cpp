@@ -316,7 +316,7 @@ void AMySweetBabyBoi::DodgeReset()
 	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Koffer stoppa du ikke"));*/
 }
 
-void AMySweetBabyBoi::PickupSword()
+
 void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 {
 	ASword* SwordToDestroy = NearbySword[0];

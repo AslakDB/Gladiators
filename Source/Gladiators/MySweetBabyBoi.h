@@ -130,9 +130,7 @@ public:
 			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex,
 			bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
+	
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
