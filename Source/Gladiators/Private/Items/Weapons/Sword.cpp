@@ -41,8 +41,6 @@ void ASword::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 void ASword::Pickup()
 {
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
 	Destroy();
 }
 

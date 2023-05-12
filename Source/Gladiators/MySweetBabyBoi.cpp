@@ -14,6 +14,7 @@
 #include "Components/SphereComponent.h"
 #include "BossWidget.h"
 #include "Public/Enemy/Enemy.h"
+#include "Engine/EngineTypes.h"
 
 #include "InventoryWidget.h"
 #include "Public/Hud/PauseMenuWidget.h"
@@ -75,6 +76,8 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 	
 	MaxHealth = 100;
 	Health = MaxHealth;
+	DodgeCooldownTime = 2.f;
+	DodgeDistance = 500;
 
 	Enemy = CreateDefaultSubobject<AEnemy>(TEXT("Enemy"));
 	
@@ -86,6 +89,7 @@ void AMySweetBabyBoi::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
 
 
 	Tags.Add(FName("EngagableTarget"));
@@ -135,11 +139,15 @@ void AMySweetBabyBoi::BeginPlay()
 // Called every frame
 void AMySweetBabyBoi::Tick(float DeltaTime)
 {
+	Super::Tick(DeltaTime);
+	DodgeCooldown -= DeltaTime;
+	
+
 	if (PauseWidget)
 	{
 		if (!PauseWidget->Paused)
 		{
-			Super::Tick(DeltaTime);
+			
 
 			if (GetCharacterMovement()->IsFalling())
 			{
@@ -167,8 +175,8 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 			PauseWidget->RemoveFromParent();
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
-			PlayerController->SetShowMouseCursor(false);
-			UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
+			//PlayerController->SetShowMouseCursor(false);
+			//UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
 			UGameplayStatics::SetGamePaused(this, false);
 
 			
@@ -271,14 +279,49 @@ void AMySweetBabyBoi::Movement()
 	}
 }
 
+void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
+{
+
+	//if (DodgeCooldown <= 0.f)
+	//{
+	//	// Reset the dodge cooldown
+	//	DodgeCooldown = DodgeCooldownTime;
+
+	//	// Get the character's movement component
+	//	UCharacterMovementComponent* movementComponent = GetCharacterMovement();
+
+	//	if (movementComponent)
+	//	{
+	//		// Set the movement mode to flying to allow for more agile movement
+	//		movementComponent->SetMovementMode(MOVE_Flying);
+
+	//		// Apply movement input in the dodge direction
+	//		FVector movementInput = DodgeDirection * DodgeDistance;
+	//		movementComponent->AddInputVector(movementInput);
+	//	}
+	//	
+	//}
+	//
+	//GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Dodge Called"));
+
+
+}
+
+void AMySweetBabyBoi::DodgeReset()
+{
+
+	/*UCharacterMovementComponent* movementComp = GetCharacterMovement();
+
+	movementComp->StopMovementImmediately();
+	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Koffer stoppa du ikke"));*/
+}
+
+void AMySweetBabyBoi::PickupSword()
 void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 {
-	ASword* ItemToDestroy = NearbySword[0];
-	NearbySword.RemoveAt(0);
-	ItemToDestroy->Pickup();
-	HaveSword = true;
-	HaveAxe = false;
-	HaveSpear = false;
+	ASword* SwordToDestroy = NearbySword[0];
+	NearbySword.Empty();
+	SwordToDestroy->Pickup();
 	GetSword();
 
 	//SwordEquipped->SetOwner(this);
@@ -291,11 +334,8 @@ void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 void AMySweetBabyBoi::PickupSpear(ASpear* SpearEquipped)
 {
 	ASpear* SpearToDestroy = NearbySpear[0];
-	NearbySpear.RemoveAt(0);
+	NearbySpear.Empty();
 	SpearToDestroy->Pickup();
-	HaveSpear = true;
-	HaveSword = false;
-	HaveAxe = false;
 	GetSpear();
 
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
@@ -306,11 +346,8 @@ void AMySweetBabyBoi::PickupSpear(ASpear* SpearEquipped)
 void AMySweetBabyBoi::PickupAxe(AAxe* AxeEquipped)
 {
 	AAxe* AxeToDestroy = NearbyAxe[0];
-	NearbyAxe.RemoveAt(0);
+	NearbyAxe.Empty();
 	AxeToDestroy->Pickup();
-	HaveAxe = true;
-	HaveSword = false;
-	HaveSpear = false;
 	GetAxe();
 	
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
@@ -321,29 +358,94 @@ void AMySweetBabyBoi::PickupAxe(AAxe* AxeEquipped)
 void AMySweetBabyBoi::GetSword()
 {
 
-	SpawnSword = GetWorld()->SpawnActor<AActor>(Sword, FVector(0, 0, 0), FRotator(90, 0, 0));
-	if(SpawnSword)
-	SpawnSword->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Sword"));
-	
+	SwordRef = GetWorld()->SpawnActor<ASword>(Sword, FVector(0, 0, 0), FRotator(90, 0, 0));
+	if(SwordRef)
+	SwordRef->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Sword"));
 
+
+	if(SpawnSpear)
+	{
+		FDetachmentTransformRules* Detachment;
+		SpawnSpear->DetachFromActor(Detachment->KeepWorldTransform);
+		SpawnSpear->SpearCollider->SetSimulatePhysics(true);
+		SpawnSpear = nullptr;
+
+	}
+
+	if (SpawnAxe)
+	{
+		FDetachmentTransformRules* Detachment;
+		SpawnAxe->DetachFromActor(Detachment->KeepWorldTransform);
+		SpawnAxe->AxeCollider->SetSimulatePhysics(true);
+		SpawnAxe = nullptr;
+	}
+
+	HaveAxe = false;
+	HaveSword = true;
+	HaveSpear = false;
 	
 }
 
 void AMySweetBabyBoi::GetSpear()
 {
-	SpawnSpear = GetWorld()->SpawnActor<AActor>(Spear, FVector(0, 0, 0), FRotator(90, 0, 0));
+	SpawnSpear = GetWorld()->SpawnActor<ASpear>(Spear, FVector(0, 0, 0), FRotator(90, 0, 0));
 	if (SpawnSpear)
 		SpawnSpear->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Spear"));
-	
+
+	if (SwordRef)
+	{
+		FDetachmentTransformRules* Detachment;
+		SwordRef->DetachFromActor(Detachment->KeepWorldTransform);
+		SwordRef->Collider->SetSimulatePhysics(true);
+		SwordRef = nullptr;
+	}
+
+	if (SpawnAxe)
+	{
+		FDetachmentTransformRules* Detachment;
+		SpawnAxe->DetachFromActor(Detachment->KeepWorldTransform);
+		SpawnAxe->AxeCollider->SetSimulatePhysics(true);
+		SpawnAxe = nullptr;
+	}
+
+
+
+	HaveAxe = false;
+	HaveSword = false;
+	HaveSpear = true;
 	
 }
 
 void AMySweetBabyBoi::GetAxe()
 {
-	SpawnAxe = GetWorld()->SpawnActor<AActor>(Axe, FVector(0, 0, 0), FRotator(90, 0, 0));
+	SpawnAxe = GetWorld()->SpawnActor<AAxe>(Axe, FVector(0, 0, 0), FRotator(90, 0, 0));
 	if (SpawnAxe)
 		SpawnAxe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("Axe"));
+
+	
+	if (SwordRef)
+	{
+		FDetachmentTransformRules* Detachment;
+		SwordRef->DetachFromActor(Detachment->KeepWorldTransform);
+		SwordRef->Collider->SetSimulatePhysics(true);
+		SwordRef = nullptr;
+	}
+
+	if (SpawnSpear)
+	{
+		FDetachmentTransformRules* Detachment;
+		SpawnSpear->DetachFromActor(Detachment->KeepWorldTransform);
+		SpawnSpear->SpearCollider->SetSimulatePhysics(true);
+		SpawnSpear = nullptr;
+
+	}
+
+
+	HaveAxe = true;
+	HaveSword = false;
+	HaveSpear = false;
 }
+
 
 void AMySweetBabyBoi::PickupPotion()
 {
@@ -381,10 +483,6 @@ void AMySweetBabyBoi::ResetAttack()
 
 void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor->IsA<ASword>())
-	{
-		NearbySword.Add(Cast<ASword>(OtherActor));
-	}
 	if (OtherActor->IsA<ASpear>())
 	{
 		NearbySpear.Add(Cast<ASpear>(OtherActor));
@@ -393,6 +491,12 @@ void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	{
 		NearbyAxe.Add(Cast<AAxe>(OtherActor));
 	}
+	if (OtherActor->IsA<ASword>())
+	{
+		NearbySword.Add(Cast<ASword>(OtherActor));
+	}
+	
+	
 	if (OtherActor->IsA<AHealthPotion>())
 	{
 		Potions.Add(Cast<AHealthPotion>(OtherActor));
@@ -400,7 +504,11 @@ void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 }
 
 void AMySweetBabyBoi::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex)
-{	
+{
+	if (OtherActor->IsA<AAxe>())
+	{
+		NearbyAxe.Remove(Cast<AAxe>(OtherActor));
+	}
 	if (OtherActor->IsA<ASword>())
 	{
 		NearbySword.Remove(Cast<ASword>(OtherActor));
@@ -410,10 +518,7 @@ void AMySweetBabyBoi::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		NearbySpear.Remove(Cast<ASpear>(OtherActor));
 	}
-	if(OtherActor->IsA<AAxe>())
-	{
-		NearbyAxe.Remove(Cast<AAxe>(OtherActor));
-	}
+	
 	if (OtherActor->IsA<AHealthPotion>())
 	{
 		Potions.Remove(Cast<AHealthPotion>(OtherActor));
@@ -478,10 +583,6 @@ void AMySweetBabyBoi::HeavyAttack(const FInputActionValue& input)
 }
 
 
-void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
-{
-}
-
 void AMySweetBabyBoi::Use(const FInputActionValue& input)
 {
 	ASword* OverlappingSword = Cast<ASword>(OverlappingItem);
@@ -490,6 +591,15 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 
 	if (NearbySword.Num() > 0)
 	{
+		PickupSword();
+		//return;
+		NearbySword.Empty();
+	}
+	if (NearbySpear.Num() > 0)
+	{
+		PickupSpear();
+		//return;
+		NearbySpear.Empty();
 		PickupSword(OverlappingSword);
 		SpawnDefaultSword();
 		return;
@@ -502,8 +612,10 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 	}
 	if (NearbyAxe.Num() > 0)
 	{
-		GEngine->AddOnScreenDebugMessage(9, 8, FColor::Magenta, TEXT("Axe is nearby"));
 
+		PickupAxe();
+		//return;
+		NearbyAxe.Empty();
 		PickupAxe(OverlappingAxe);
 		SpawnDefaultAxe();
 		return;
