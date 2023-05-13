@@ -91,14 +91,9 @@ void AMySweetBabyBoi::BeginPlay()
 {
 	Super::BeginPlay();
 
-	
-	
-
 	Tags.Add(FName("EngagableTarget"));
 
-
 	GetCharacterMovement()->MaxWalkSpeed = 330.f;
-
 	// Add the mapping context
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
@@ -113,7 +108,7 @@ void AMySweetBabyBoi::BeginPlay()
 
 	if (UWorld* World = GetWorld())
 	{
-		HealthBar = CreateWidget<UHealthBar>(World, THealthBar);
+		
 		PauseWidget = CreateWidget<UPauseMenuWidget>(World, TPauseWidget);
 		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
 	}
@@ -141,16 +136,20 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 				GetCharacterMovement()->bOrientRotationToMovement = true;
 			}
 
-			if (HealthBarWidget->HealthBarWidget)
+			HealthBarWidget->SetHealthBarPercent(Attributes->GetHealthPercent());
+
+			if (!HealthBarWidget->HealthBarWidget)
 			{
-				HealthBarWidget->HealthBarWidget->AddToViewport();	
+				HealthBarWidget->HealthBarWidget = Cast<UHealthBar>(HealthBarWidget->GetUserWidgetObject());
+			}
+			else if (HealthBarWidget->HealthBarWidget)
+			{
+				HealthBarWidget->HealthBarWidget->AddToViewport(99);
 			}
 			else
 			{
-				GEngine->AddOnScreenDebugMessage(9, 5, FColor::Emerald, TEXT("Healbar is null"));
+			GEngine->AddOnScreenDebugMessage(9, 5, FColor::Emerald, TEXT("Healbar is null"));
 			}
-
-			HealthBar->AddToViewport(1);
 
 			Movement();
 
@@ -236,14 +235,11 @@ void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 	ActionState = EActionState::EAS_HitReaction;
-
-	//PlayHitSound(ImpactPoint);
-	//SpawnHitParticles(ImpactPoint);
 }
 
 void AMySweetBabyBoi::Movement()
 {
-	if (ActionState != EActionState::EAS_Unoccupied) return;
+	//if (ActionState != EActionState::EAS_Unoccupied) return;
 	//Movement
 	FRotator ControlRotation = Controller->GetControlRotation();
 
@@ -312,8 +308,7 @@ void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 	SwordToDestroy->Pickup();
 	GetSword();
 
-	//SwordEquipped->SetOwner(this);
-	//SwordEquipped->SetInstigator(this);
+	
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedSword = SwordEquipped;
@@ -579,23 +574,26 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 
 	if (NearbySword.Num() > 0)
 	{
-		NearbySword.Empty();
+		
 		PickupSword(OverlappingSword);
+		NearbySword.Empty();
 		SpawnDefaultSword();
 		return;
 	}
 	
 	if (NearbySpear.Num() > 0)
 	{
-		NearbySpear.Empty();
+		
 		PickupSpear(OverlappingSpear);
+		NearbySpear.Empty();
 		SpawnDefaultSpear();
 		return;
 	}
 	if (NearbyAxe.Num() > 0)
 	{
-		NearbyAxe.Empty();
+		
 		PickupAxe(OverlappingAxe);
+		NearbyAxe.Empty();
 		SpawnDefaultAxe();
 		return;
 	}
