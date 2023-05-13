@@ -78,6 +78,7 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 	Health = MaxHealth;
 	DodgeCooldownTime = 2.f;
 	DodgeDistance = 500;
+	
 
 	Enemy = CreateDefaultSubobject<AEnemy>(TEXT("Enemy"));
 	
@@ -255,7 +256,7 @@ void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 
 void AMySweetBabyBoi::Movement()
 {
-	if (ActionState != EActionState::EAS_Unoccupied) return;
+	//if (ActionState != EActionState::EAS_Unoccupied) return;
 	//Movement
 	FRotator ControlRotation = Controller->GetControlRotation();
 
@@ -282,50 +283,48 @@ void AMySweetBabyBoi::Movement()
 void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
 {
 
-	//if (DodgeCooldown <= 0.f)
-	//{
-	//	// Reset the dodge cooldown
-	//	DodgeCooldown = DodgeCooldownTime;
+	if (DodgeCooldown <= 0.f)
+	{
+		DodgeCooldown = DodgeCooldownTime;
+		UCharacterMovementComponent* movementComponent = GetCharacterMovement();
+		
+		if (movementComponent)
+		{
+			if(movementComponent->MovementMode != MOVE_Flying)
+			{
+				movementComponent->SetMovementMode(MOVE_Flying);
+				FVector movementInput = DodgeDirection * DodgeDistance;
+				movementComponent->AddInputVector(movementInput);
 
-	//	// Get the character's movement component
-	//	UCharacterMovementComponent* movementComponent = GetCharacterMovement();
-
-	//	if (movementComponent)
-	//	{
-	//		// Set the movement mode to flying to allow for more agile movement
-	//		movementComponent->SetMovementMode(MOVE_Flying);
-
-	//		// Apply movement input in the dodge direction
-	//		FVector movementInput = DodgeDirection * DodgeDistance;
-	//		movementComponent->AddInputVector(movementInput);
-	//	}
-	//	
-	//}
-	//
-	//GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Dodge Called"));
-
+				GetWorld()->GetTimerManager().SetTimer(Timer, this, &AMySweetBabyBoi::DodgeReset, 1.f, false);
+			}
+			/*else
+			{
+				movementComponent->SetMovementMode(MOVE_Walking);
+			}*/
+		}
+		
+		
+	}
+	
+	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Dodge Called"));
+	
 
 }
 
 void AMySweetBabyBoi::DodgeReset()
 {
-
-	/*UCharacterMovementComponent* movementComp = GetCharacterMovement();
-
-	movementComp->StopMovementImmediately();
-	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Koffer stoppa du ikke"));*/
+	UCharacterMovementComponent* movementComponent = GetCharacterMovement();
+	movementComponent->SetMovementMode(MOVE_Walking);
+	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Koffer stoppa du ikke"));
 }
 
-void AMySweetBabyBoi::PickupSword()
 void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 {
 	ASword* SwordToDestroy = NearbySword[0];
 	NearbySword.Empty();
 	SwordToDestroy->Pickup();
 	GetSword();
-
-	//SwordEquipped->SetOwner(this);
-	//SwordEquipped->SetInstigator(this);
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedSword = SwordEquipped;
@@ -337,7 +336,6 @@ void AMySweetBabyBoi::PickupSpear(ASpear* SpearEquipped)
 	NearbySpear.Empty();
 	SpearToDestroy->Pickup();
 	GetSpear();
-
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedSpear = SpearEquipped;
@@ -349,7 +347,6 @@ void AMySweetBabyBoi::PickupAxe(AAxe* AxeEquipped)
 	NearbyAxe.Empty();
 	AxeToDestroy->Pickup();
 	GetAxe();
-	
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedAxe = AxeEquipped;
@@ -591,39 +588,28 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 
 	if (NearbySword.Num() > 0)
 	{
-		PickupSword();
-		//return;
-		NearbySword.Empty();
-	}
-	if (NearbySpear.Num() > 0)
-	{
-		PickupSpear();
-		//return;
-		NearbySpear.Empty();
 		PickupSword(OverlappingSword);
+		NearbySword.Empty();
 		SpawnDefaultSword();
 		return;
 	}
 	if (NearbySpear.Num() > 0)
 	{
 		PickupSpear(OverlappingSpear);
+		NearbySpear.Empty();
 		SpawnDefaultSpear();
 		return;
 	}
 	if (NearbyAxe.Num() > 0)
 	{
 
-		PickupAxe();
-		//return;
-		NearbyAxe.Empty();
 		PickupAxe(OverlappingAxe);
+		NearbyAxe.Empty();
 		SpawnDefaultAxe();
 		return;
 	}
 	if (Potions.Num() > 0)
 	{
-		GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Potions nearby"));
-
 		PickupPotion();
 	}
 	if (InventoryWidget->IsInViewport() && InventoryWidget->InventoryCount !=0)

@@ -133,9 +133,7 @@ public:
 	UFUNCTION()
 		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
-	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<ASword*> NearbySword;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
@@ -159,6 +157,7 @@ private:
 	void HeavyAttack(const FInputActionValue& input);
 	void Dodge(const FInputActionValue& input);
 	void Use(const FInputActionValue& input);
+
 	/*Functions for open and close inventory*/
 	void OpenInv(const FInputActionValue& input);
 	void CloseInv(const FInputActionValue& input);
@@ -257,6 +256,7 @@ public:
 	float DodgeCooldown;
 	float DodgeCooldownTime;
 	FVector DodgeDirection;
+	FTimerHandle Timer;
 
 	float Yaw;
 	float Pitch;
