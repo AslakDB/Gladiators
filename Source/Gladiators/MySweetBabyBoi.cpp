@@ -234,7 +234,6 @@ void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 
 void AMySweetBabyBoi::Movement()
 {
-	//if (ActionState != EActionState::EAS_Unoccupied) return;
 	//Movement
 	FRotator ControlRotation = Controller->GetControlRotation();
 
@@ -296,8 +295,6 @@ void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 	NearbySword.Empty();
 	SwordToDestroy->Pickup();
 	GetSword();
-
-	
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedSword = SwordEquipped;
