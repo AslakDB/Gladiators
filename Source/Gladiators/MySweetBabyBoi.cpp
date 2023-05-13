@@ -784,7 +784,7 @@ void AMySweetBabyBoi::SpawnDefaultSword()
 	if (World && SwordClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(SwordClass);
-		DefaultWeapon->Equip(GetMesh(), FName("SwordSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("Sword"), this, this);
 		EquippedWeapon = DefaultWeapon;
 	}
 }
@@ -795,7 +795,7 @@ void AMySweetBabyBoi::SpawnDefaultSpear()
 	if (World && SpearClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(SpearClass);
-		DefaultWeapon->Equip(GetMesh(), FName("SpearSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("Spear"), this, this);
 		EquippedWeapon = DefaultWeapon;
 	}
 }
@@ -806,7 +806,7 @@ void AMySweetBabyBoi::SpawnDefaultAxe()
 	if (World && AxeClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(AxeClass);
-		DefaultWeapon->Equip(GetMesh(), FName("AxeSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("Axe"), this, this);
 		EquippedWeapon = DefaultWeapon;
 	}
 }
