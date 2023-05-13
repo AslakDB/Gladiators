@@ -13,12 +13,13 @@ class UProgressBar;
 UCLASS()
 class GLADIATORS_API UEnemyHealthBar : public UWidgetComponent
 {
+public:
 	GENERATED_BODY()
+		
 
+private:
+		
+		
 
-		UPROPERTY(EditAnywhere, meta = (BindWidget))
-		UProgressBar* EnemyHealthBar;
-
-	UFUNCTION(BlueprintCallable, Category = "HUD")
-		void SetEnemyHealth(float CurrentHealth, float MaxHealth);
+	
 };

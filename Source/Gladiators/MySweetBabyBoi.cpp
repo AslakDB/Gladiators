@@ -14,10 +14,12 @@
 #include "Components/SphereComponent.h"
 #include "BossWidget.h"
 #include "Public/Enemy/Enemy.h"
+#include "Engine/EngineTypes.h"
 
 #include "InventoryWidget.h"
 #include "Public/Hud/PauseMenuWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Public/Hud/Health/HealthBarComponent.h"
 
 #include "PlayerUserWidget.h"
 #include "Blueprint/UserWidget.h"
@@ -29,6 +31,15 @@
 #include "Items/Weapons/Sword.h"
 #include "Items/Weapons/Axe.h"
 #include "Kismet/GameplayStatics.h"
+
+#include "Components/StaticMeshComponent.h"
+#include "Components/InputComponent.h"
+#include "Items/Item.h"
+#include "Items/Weapons/Weapon.h"
+#include "Animation/AnimMontage.h"
+#include "Components/AttributeComponent.h"
+#include "Hud/Health/HealthBar.h"
+#include "Public/Hud/Health/HealthBar.h"
 
 // Sets default values
 AMySweetBabyBoi::AMySweetBabyBoi()
@@ -43,6 +54,8 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+	
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
 
 	ColliderPickupWork = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	ColliderPickupWork->SetupAttachment(GetRootComponent());
@@ -57,8 +70,16 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
+	GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	GetMesh()->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
+	
 	MaxHealth = 100;
 	Health = MaxHealth;
+	DodgeCooldownTime = 2.f;
+	DodgeDistance = 500;
 
 	Enemy = CreateDefaultSubobject<AEnemy>(TEXT("Enemy"));
 	
@@ -73,7 +94,6 @@ void AMySweetBabyBoi::BeginPlay()
 	Tags.Add(FName("EngagableTarget"));
 
 	GetCharacterMovement()->MaxWalkSpeed = 330.f;
-
 	// Add the mapping context
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
@@ -88,28 +108,12 @@ void AMySweetBabyBoi::BeginPlay()
 
 	if (UWorld* World = GetWorld())
 	{
-		Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
-		if (Widget)
-		{
-			Widget->AddToViewport(2);
-		}
-
+		
 		PauseWidget = CreateWidget<UPauseMenuWidget>(World, TPauseWidget);
-		if (PauseWidget)
-		{
-			PauseWidget->AddToViewport(3);
-		}
-
 		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
-		CyclopsWidget = CreateWidget<UBossWidget>(World, TCyclopsWidget);
-		ManticoreWidget = CreateWidget<UBossWidget>(World, TManticoreWidget);
 	}
 
-	if (InventoryWidget)
-	{
-		InventoryWidget->InventoryCount = 0;
-	}
-
+	if (InventoryWidget){InventoryWidget->InventoryCount = 0;}
 	GameIsPaused = false;
 }
 
@@ -117,13 +121,12 @@ void AMySweetBabyBoi::BeginPlay()
 void AMySweetBabyBoi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	DodgeCooldown -= DeltaTime;
 
 	if (PauseWidget)
 	{
 		if (!PauseWidget->Paused)
 		{
-			
-
 			if (GetCharacterMovement()->IsFalling())
 			{
 				GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -133,8 +136,20 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 				GetCharacterMovement()->bOrientRotationToMovement = true;
 			}
 
-			// Pulled this out to its own function
-			
+			HealthBarWidget->SetHealthBarPercent(Attributes->GetHealthPercent());
+
+			if (!HealthBarWidget->HealthBarWidget)
+			{
+				HealthBarWidget->HealthBarWidget = Cast<UHealthBar>(HealthBarWidget->GetUserWidgetObject());
+			}
+			else if (HealthBarWidget->HealthBarWidget)
+			{
+				HealthBarWidget->HealthBarWidget->AddToViewport(99);
+			}
+			else
+			{
+			GEngine->AddOnScreenDebugMessage(9, 5, FColor::Emerald, TEXT("Healbar is null"));
+			}
 
 			Movement();
 
@@ -148,23 +163,10 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 			PauseWidget->RemoveFromParent();
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
-			//PlayerController->SetShowMouseCursor(false);
-			//UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
+			
 			UGameplayStatics::SetGamePaused(this, false);
 
-			if (Widget)
-			{
-
-				Widget->SetPlayerHealth(Health, MaxHealth);
-			}
-			if(CyclopsWidget && Enemy)
-			{
-			CyclopsWidget->SetBossHealth(Enemy->EnemyMaxHealth, Enemy->EnemyHealth);
-			}
-			if (ManticoreWidget && Enemy)
-			{
-			ManticoreWidget->SetBossHealth(Enemy->EnemyMaxHealth, Enemy->EnemyHealth);
-			}
+			
 		}
 		
 		else
@@ -177,10 +179,6 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			UGameplayStatics::SetGamePaused(this, true);
 		}
 	}
-
-	
-	
-
 }
 
 
@@ -215,11 +213,33 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);
 		EnhanceInputCom->BindAction(PauseGame, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::PausedGame);
 
+		/*TEST*/
+		EnhanceInputCom->BindAction(FKeyAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::FKeyPressed);
+		//EnhanceInputCom->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Attack);
+
 	}
+}
+
+float AMySweetBabyBoi::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Health -= DamageAmount;
+	
+	HandleDamage(DamageAmount);
+	return DamageAmount;
+	
+}
+
+void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit)
+{
+	Super::GetHit_Implementation(ImpactPoint, ActorHit);
+
+	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+	ActionState = EActionState::EAS_HitReaction;
 }
 
 void AMySweetBabyBoi::Movement()
 {
+	//if (ActionState != EActionState::EAS_Unoccupied) return;
 	//Movement
 	FRotator ControlRotation = Controller->GetControlRotation();
 
@@ -243,29 +263,79 @@ void AMySweetBabyBoi::Movement()
 	}
 }
 
-void AMySweetBabyBoi::PickupSword()
+void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
+{
+
+	//if (DodgeCooldown <= 0.f)
+	//{
+	//	// Reset the dodge cooldown
+	//	DodgeCooldown = DodgeCooldownTime;
+
+	//	// Get the character's movement component
+	//	UCharacterMovementComponent* movementComponent = GetCharacterMovement();
+
+	//	if (movementComponent)
+	//	{
+	//		// Set the movement mode to flying to allow for more agile movement
+	//		movementComponent->SetMovementMode(MOVE_Flying);
+
+	//		// Apply movement input in the dodge direction
+	//		FVector movementInput = DodgeDirection * DodgeDistance;
+	//		movementComponent->AddInputVector(movementInput);
+	//	}
+	//	
+	//}
+	//
+	//GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Dodge Called"));
+
+
+}
+
+void AMySweetBabyBoi::DodgeReset()
+{
+
+	/*UCharacterMovementComponent* movementComp = GetCharacterMovement();
+
+	movementComp->StopMovementImmediately();
+	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Koffer stoppa du ikke"));*/
+}
+
+
+void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 {
 	ASword* SwordToDestroy = NearbySword[0];
 	NearbySword.Empty();
 	SwordToDestroy->Pickup();
 	GetSword();
+
 	
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+	OverlappingItem = nullptr;
+	EquippedSword = SwordEquipped;
 }
 
-void AMySweetBabyBoi::PickupSpear()
+void AMySweetBabyBoi::PickupSpear(ASpear* SpearEquipped)
 {
 	ASpear* SpearToDestroy = NearbySpear[0];
 	NearbySpear.Empty();
 	SpearToDestroy->Pickup();
 	GetSpear();
+
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+	OverlappingItem = nullptr;
+	EquippedSpear = SpearEquipped;
 }
 
-void AMySweetBabyBoi::PickupAxe()
+void AMySweetBabyBoi::PickupAxe(AAxe* AxeEquipped)
 {
 	AAxe* AxeToDestroy = NearbyAxe[0];
 	NearbyAxe.Empty();
 	AxeToDestroy->Pickup();
 	GetAxe();
+	
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+	OverlappingItem = nullptr;
+	EquippedAxe = AxeEquipped;
 }
 
 void AMySweetBabyBoi::GetSword()
@@ -359,16 +429,11 @@ void AMySweetBabyBoi::GetAxe()
 	HaveSpear = false;
 }
 
-void AMySweetBabyBoi::RemoveSpear()
-{
-	
-}
 
 void AMySweetBabyBoi::PickupPotion()
 {
 	if (InventoryWidget && InventoryWidget->InventoryCount != 3)
 	{
-	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Picking up potions"));
 	AHealthPotion* PotionToDestroy = Potions[0];
 	Potions.RemoveAt(0);
 	PotionToDestroy->Pickup();
@@ -376,6 +441,11 @@ void AMySweetBabyBoi::PickupPotion()
 	}
 }
 
+void AMySweetBabyBoi::SweetDeath()
+{
+	UGameplayStatics::OpenLevel(this, "DeathScreenLevel");
+	
+}
 
 bool AMySweetBabyBoi::GetIsAttack()
 {
@@ -460,18 +530,21 @@ void AMySweetBabyBoi::MouseY(const FInputActionValue& input)
 
 void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 {
-	IsAttack = true;
-	if(HaveSword)
+	if (CanAttack())
 	{
-		SwordAttack = true;
-	}
-	if(HaveAxe)
-	{
-		AxeAttack = true;
-	}
-	if(HaveSpear)
-	{
-		SpearAttack = true;
+		IsAttack = true;
+		if (HaveSword)
+		{
+			SwordAttack = true;
+		}
+		if (HaveAxe)
+		{
+			AxeAttack = true;
+		}
+		if (HaveSpear)
+		{
+			SpearAttack = true;
+		}
 	}
 }
 
@@ -493,41 +566,44 @@ void AMySweetBabyBoi::HeavyAttack(const FInputActionValue& input)
 }
 
 
-void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
-{
-}
-
 void AMySweetBabyBoi::Use(const FInputActionValue& input)
 {
-	
+	ASword* OverlappingSword = Cast<ASword>(OverlappingItem);
+	ASpear* OverlappingSpear = Cast<ASpear>(OverlappingItem);
+	AAxe* OverlappingAxe = Cast<AAxe>(OverlappingItem);
+
 	if (NearbySword.Num() > 0)
 	{
-		PickupSword();
-		//return;
+		
+		PickupSword(OverlappingSword);
 		NearbySword.Empty();
+		SpawnDefaultSword();
+		return;
 	}
+	
 	if (NearbySpear.Num() > 0)
 	{
-		PickupSpear();
-		//return;
+		
+		PickupSpear(OverlappingSpear);
 		NearbySpear.Empty();
+		SpawnDefaultSpear();
+		return;
 	}
 	if (NearbyAxe.Num() > 0)
 	{
-
-		PickupAxe();
-		//return;
+		
+		PickupAxe(OverlappingAxe);
 		NearbyAxe.Empty();
+		SpawnDefaultAxe();
+		return;
 	}
 	if (Potions.Num() > 0)
 	{
-		GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Potions nearby"));
-
 		PickupPotion();
 	}
 	if (InventoryWidget->IsInViewport() && InventoryWidget->InventoryCount !=0)
 	{
-		Health = MaxHealth;
+		Attributes->Heal();
 		InventoryWidget->InventoryCount--;
 	}
 }
@@ -549,7 +625,7 @@ void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
 	}
 }
 
-	void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
+void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 	{
 		if (PauseWidget)
 		{
@@ -563,6 +639,172 @@ void AMySweetBabyBoi::CloseInv(const FInputActionValue& input)
 		}
 	}
 
+void AMySweetBabyBoi::FKeyPressed()
+{
+	/*AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
+	if (OverlappingWeapon)
+	{
+		EquipWeapon(OverlappingWeapon);
+	}
+	else
+	{
+		if (CanDisarm())
+		{
+			Disarm();
+		}
+		else if (CanArm())
+		{
+			Arm();
+		}
+	}*/
 
+	ASword* OverlappingSword = Cast<ASword>(OverlappingItem);
+	if (OverlappingSword)
+	{
+		EquipSword(OverlappingSword);
+	}
+	else
+	{
+		if (CanDisarm())
+		{
+			Disarm();
+		}
+		else if (CanArm())
+		{
+			Arm();
+		}
+	}
+}
 
+//void AMySweetBabyBoi::Attack()
+//{
+//	Super::Attack();
+//	/*if (CanAttack())
+//	{
+//		PlayAttackMontage();
+//		ActionState = EActionState::EAS_Attacking;
+//	}*/
+//
+//	IsAttack = true;
+//	if (HaveSword)
+//	{
+//		SwordAttack = true;
+//	}
+//	if (HaveAxe)
+//	{
+//		AxeAttack = true;
+//	}
+//	if (HaveSpear)
+//	{
+//		SpearAttack = true;
+//	}
+//}
 
+void AMySweetBabyBoi::EquipWeapon(AWeapon* Weapon)
+{
+	Weapon->Equip(GetMesh(), FName("Sword"), this, this);
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+	OverlappingItem = nullptr;
+	EquippedWeapon = Weapon;
+}
+
+void AMySweetBabyBoi::EquipSword(ASword* SwordEquip)
+{
+	SwordEquip->Equip(GetMesh(), FName("Sword"), this, this);
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+	OverlappingItem = nullptr;
+	EquippedSword = SwordEquip;
+}
+
+void AMySweetBabyBoi::AttackEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+bool AMySweetBabyBoi::CanAttack()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool AMySweetBabyBoi::CanDisarm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState != ECharacterState::ECS_Unequipped;
+}
+
+bool AMySweetBabyBoi::CanArm()
+{
+	return ActionState == EActionState::EAS_Unoccupied &&
+		CharacterState == ECharacterState::ECS_Unequipped &&
+		EquippedWeapon;
+}
+
+void AMySweetBabyBoi::Disarm()
+{
+	PlayEquipMontage(FName("Unequip"));
+	CharacterState = ECharacterState::ECS_Unequipped;
+}
+
+void AMySweetBabyBoi::Arm()
+{
+	PlayEquipMontage(FName("Equip"));
+	CharacterState = ECharacterState::ECS_EquippedWeapon;
+}
+
+void AMySweetBabyBoi::PlayEquipMontage(const FName& SectionName)
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && EquipMontage)
+	{
+			AnimInstance->Montage_Play(EquipMontage);
+			AnimInstance->Montage_JumpToSection(SectionName, EquipMontage);
+	}
+}
+
+void AMySweetBabyBoi::HitReactEnd()
+{
+	ActionState = EActionState::EAS_Unoccupied;
+}
+
+void AMySweetBabyBoi::HandleDamage(float DamageAmount)
+{
+	Super::HandleDamage(DamageAmount);
+	if (Attributes && HealthBarWidget)
+	{
+		HealthBarWidget->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
+}
+
+void AMySweetBabyBoi::SpawnDefaultSword()
+{
+	UWorld* World = GetWorld();
+	if (World && SwordClass)
+	{
+		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(SwordClass);
+		DefaultWeapon->Equip(GetMesh(), FName("Sword"), this, this);
+		EquippedWeapon = DefaultWeapon;
+	}
+}
+
+void AMySweetBabyBoi::SpawnDefaultSpear()
+{
+	UWorld* World = GetWorld();
+	if (World && SpearClass)
+	{
+		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(SpearClass);
+		DefaultWeapon->Equip(GetMesh(), FName("Spear"), this, this);
+		EquippedWeapon = DefaultWeapon;
+	}
+}
+
+void AMySweetBabyBoi::SpawnDefaultAxe()
+{
+	UWorld* World = GetWorld();
+	if (World && AxeClass)
+	{
+		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(AxeClass);
+		DefaultWeapon->Equip(GetMesh(), FName("Axe"), this, this);
+		EquippedWeapon = DefaultWeapon;
+	}
+}
