@@ -127,10 +127,10 @@ public:
 			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex,
 			bool bFromSweep, const FHitResult& SweepResult);
 
-	UFUNCTION()
-		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
 	
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<ASword*> NearbySword;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
@@ -173,7 +173,7 @@ private:
 
 
 public:
-
+		
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
 

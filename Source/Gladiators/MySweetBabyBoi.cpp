@@ -38,6 +38,8 @@
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
 #include "Components/AttributeComponent.h"
+#include "Hud/Health/HealthBar.h"
+#include "Public/Hud/Health/HealthBar.h"
 
 // Sets default values
 AMySweetBabyBoi::AMySweetBabyBoi()
@@ -88,8 +90,8 @@ void AMySweetBabyBoi::BeginPlay()
 	Super::BeginPlay();
 
 	Tags.Add(FName("EngagableTarget"));
-	GetCharacterMovement()->MaxWalkSpeed = 330.f;
 
+	GetCharacterMovement()->MaxWalkSpeed = 330.f;
 	// Add the mapping context
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
@@ -104,12 +106,8 @@ void AMySweetBabyBoi::BeginPlay()
 
 	if (UWorld* World = GetWorld())
 	{
+		
 		PauseWidget = CreateWidget<UPauseMenuWidget>(World, TPauseWidget);
-		if (PauseWidget)
-		{
-			PauseWidget->AddToViewport(3);
-		}
-
 		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
 	}
 
@@ -118,6 +116,7 @@ void AMySweetBabyBoi::BeginPlay()
 		InventoryWidget->InventoryCount = 0;
 	}
 
+	if (InventoryWidget){InventoryWidget->InventoryCount = 0;}
 	GameIsPaused = false;
 }
 
@@ -126,14 +125,11 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	DodgeCooldown -= DeltaTime;
-	
 
 	if (PauseWidget)
 	{
 		if (!PauseWidget->Paused)
 		{
-			
-
 			if (GetCharacterMovement()->IsFalling())
 			{
 				GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -141,6 +137,21 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			else
 			{
 				GetCharacterMovement()->bOrientRotationToMovement = true;
+			}
+
+			HealthBarWidget->SetHealthBarPercent(Attributes->GetHealthPercent());
+
+			if (!HealthBarWidget->HealthBarWidget)
+			{
+				HealthBarWidget->HealthBarWidget = Cast<UHealthBar>(HealthBarWidget->GetUserWidgetObject());
+			}
+			else if (HealthBarWidget->HealthBarWidget)
+			{
+				HealthBarWidget->HealthBarWidget->AddToViewport(99);
+			}
+			else
+			{
+			GEngine->AddOnScreenDebugMessage(9, 5, FColor::Emerald, TEXT("Healbar is null"));
 			}
 
 			Movement();
@@ -155,6 +166,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 			PauseWidget->RemoveFromParent();
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
+			
 			UGameplayStatics::SetGamePaused(this, false);
 		}
 		
@@ -218,13 +230,11 @@ void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 	ActionState = EActionState::EAS_HitReaction;
-
-	//PlayHitSound(ImpactPoint);
-	//SpawnHitParticles(ImpactPoint);
 }
 
 void AMySweetBabyBoi::Movement()
 {
+	//if (ActionState != EActionState::EAS_Unoccupied) return;
 	//Movement
 	FRotator ControlRotation = Controller->GetControlRotation();
 
@@ -286,6 +296,8 @@ void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 	NearbySword.Empty();
 	SwordToDestroy->Pickup();
 	GetSword();
+
+	
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedSword = SwordEquipped;
@@ -418,7 +430,8 @@ void AMySweetBabyBoi::PickupPotion()
 
 void AMySweetBabyBoi::SweetDeath()
 {
-	GEngine->AddOnScreenDebugMessage(5, 5, FColor::Emerald, TEXT("ThePlayerIsDead"));
+	UGameplayStatics::OpenLevel(this, "DeathScreenLevel");
+	
 }
 
 
@@ -543,13 +556,16 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 
 	if (NearbySword.Num() > 0)
 	{
+		
 		PickupSword(OverlappingSword);
 		NearbySword.Empty();
 		SpawnDefaultSword();
 		return;
 	}
+	
 	if (NearbySpear.Num() > 0)
 	{
+		
 		PickupSpear(OverlappingSpear);
 		NearbySpear.Empty();
 		SpawnDefaultSpear();
@@ -557,6 +573,7 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 	}
 	if (NearbyAxe.Num() > 0)
 	{
+		
 		PickupAxe(OverlappingAxe);
 		NearbyAxe.Empty();
 		SpawnDefaultAxe();
@@ -671,7 +688,7 @@ void AMySweetBabyBoi::SpawnDefaultSword()
 	if (World && SwordClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(SwordClass);
-		DefaultWeapon->Equip(GetMesh(), FName("SwordSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("Sword"), this, this);
 		EquippedWeapon = DefaultWeapon;
 	}
 }
@@ -682,7 +699,7 @@ void AMySweetBabyBoi::SpawnDefaultSpear()
 	if (World && SpearClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(SpearClass);
-		DefaultWeapon->Equip(GetMesh(), FName("SpearSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("Spear"), this, this);
 		EquippedWeapon = DefaultWeapon;
 	}
 }
@@ -693,7 +710,7 @@ void AMySweetBabyBoi::SpawnDefaultAxe()
 	if (World && AxeClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(AxeClass);
-		DefaultWeapon->Equip(GetMesh(), FName("AxeSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("Axe"), this, this);
 		EquippedWeapon = DefaultWeapon;
 	}
 }
