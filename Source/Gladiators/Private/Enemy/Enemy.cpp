@@ -18,6 +18,7 @@
 #include "Components/WidgetComponent.h"
 #include "Hud/Health/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 AEnemy::AEnemy()
 {
@@ -29,7 +30,7 @@ AEnemy::AEnemy()
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
-	HealthBarWidget->SetupAttachment(RootComponent);
+	HealthBarWidget->SetupAttachment(GetMesh());
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;

@@ -34,5 +34,6 @@ public:
 	float GetHealthPercent();
 	bool IsAlive();
 	void AddHealthPotions(int32 NumberOfHealthPotions);
+	void Heal();
 	FORCEINLINE int32 GetHealthPotions() const { return HealthPotions; }
 };

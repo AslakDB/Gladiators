@@ -36,6 +36,11 @@ void UAttributeComponent::AddHealthPotions(int32 NumberOfHealthPotions)
 	Health = FMath::Clamp(Health + 20, 0.f, MaxHealth);
 }
 
+void UAttributeComponent::Heal()
+{
+	Health += MaxHealth * 0.5;
+}
+
 void UAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
