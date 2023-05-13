@@ -94,14 +94,11 @@ public:
 
 
 	
-		bool GetIsAttack();
-
-		int MaxHealth;
-			int Health;
-			bool GameIsPaused;
-
-
-		bool InventoryIsOpen;
+	//bool GetIsAttack();
+	int MaxHealth;
+	int Health;
+	bool GameIsPaused;
+	bool InventoryIsOpen;
 
 
 
@@ -180,10 +177,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
 
-	/*UPROPERTY(VisibleAnywhere)
-		class UPlayerUserWidget* Widget = nullptr;
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<UPlayerUserWidget> TWidget;*/
 
 	UPROPERTY(VisibleAnywhere)
 		class UInventoryWidget* InventoryWidget = nullptr;
@@ -251,7 +244,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		bool HaveSpear;
 
-	bool IsDodging;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		bool IsDodging;
+
+
 	float DodgeDistance;
 	float DodgeCooldown;
 	float DodgeCooldownTime;
@@ -263,14 +259,8 @@ public:
 
 protected:
 
-	void FKeyPressed();
-	//virtual void Attack() override;
 
-	/** Combat */
-	void EquipWeapon(AWeapon* Weapon);
-	void EquipSword(ASword* SwordEquip);
-	void EquipSpear(ASpear* SpearEquip);
-	void EquipAxe(AAxe* AxeEquip);
+	///** Combat */
 	virtual void AttackEnd() override;
 	virtual bool CanAttack() override;
 	bool CanDisarm();
