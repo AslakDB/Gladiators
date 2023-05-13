@@ -175,7 +175,10 @@ private:
 
 
 public:
-
+	UPROPERTY(VisibleAnywhere)
+		class UHealthBar* HealthBar;
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<UHealthBar> THealthBar;
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
 

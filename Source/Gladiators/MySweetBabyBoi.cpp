@@ -38,6 +38,8 @@
 #include "Items/Weapons/Weapon.h"
 #include "Animation/AnimMontage.h"
 #include "Components/AttributeComponent.h"
+#include "Hud/Health/HealthBar.h"
+#include "Public/Hud/Health/HealthBar.h"
 
 // Sets default values
 AMySweetBabyBoi::AMySweetBabyBoi()
@@ -90,7 +92,7 @@ void AMySweetBabyBoi::BeginPlay()
 	Super::BeginPlay();
 
 	
-
+	
 
 	Tags.Add(FName("EngagableTarget"));
 
@@ -111,28 +113,12 @@ void AMySweetBabyBoi::BeginPlay()
 
 	if (UWorld* World = GetWorld())
 	{
-		/*Widget = CreateWidget<UPlayerUserWidget>(World, TWidget);
-		if (Widget)
-		{
-			Widget->AddToViewport(2);
-		}*/
-
+		HealthBar = CreateWidget<UHealthBar>(World, THealthBar);
 		PauseWidget = CreateWidget<UPauseMenuWidget>(World, TPauseWidget);
-		if (PauseWidget)
-		{
-			PauseWidget->AddToViewport(3);
-		}
-
 		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
-		/*CyclopsWidget = CreateWidget<UBossWidget>(World, TCyclopsWidget);
-		ManticoreWidget = CreateWidget<UBossWidget>(World, TManticoreWidget);*/
 	}
 
-	if (InventoryWidget)
-	{
-		InventoryWidget->InventoryCount = 0;
-	}
-
+	if (InventoryWidget){InventoryWidget->InventoryCount = 0;}
 	GameIsPaused = false;
 }
 
@@ -141,14 +127,11 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	DodgeCooldown -= DeltaTime;
-	
 
 	if (PauseWidget)
 	{
 		if (!PauseWidget->Paused)
 		{
-			
-
 			if (GetCharacterMovement()->IsFalling())
 			{
 				GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -158,10 +141,16 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 				GetCharacterMovement()->bOrientRotationToMovement = true;
 			}
 
-			//Widget->SetPlayerHealth(Health,MaxHealth);
+			if (HealthBarWidget->HealthBarWidget)
+			{
+				HealthBarWidget->HealthBarWidget->AddToViewport();	
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(9, 5, FColor::Emerald, TEXT("Healbar is null"));
+			}
 
-			// Pulled this out to its own function
-			//Health -=1 * DeltaTime ;
+			HealthBar->AddToViewport(1);
 
 			Movement();
 
@@ -175,8 +164,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 			PauseWidget->RemoveFromParent();
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
-			//PlayerController->SetShowMouseCursor(false);
-			//UWidgetBlueprintLibrary::SetInputMode_GameOnly(PlayerController);
+			
 			UGameplayStatics::SetGamePaused(this, false);
 
 			
@@ -591,30 +579,21 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 
 	if (NearbySword.Num() > 0)
 	{
-		PickupSword();
-		//return;
 		NearbySword.Empty();
-	}
-	if (NearbySpear.Num() > 0)
-	{
-		PickupSpear();
-		//return;
-		NearbySpear.Empty();
 		PickupSword(OverlappingSword);
 		SpawnDefaultSword();
 		return;
 	}
+	
 	if (NearbySpear.Num() > 0)
 	{
+		NearbySpear.Empty();
 		PickupSpear(OverlappingSpear);
 		SpawnDefaultSpear();
 		return;
 	}
 	if (NearbyAxe.Num() > 0)
 	{
-
-		PickupAxe();
-		//return;
 		NearbyAxe.Empty();
 		PickupAxe(OverlappingAxe);
 		SpawnDefaultAxe();

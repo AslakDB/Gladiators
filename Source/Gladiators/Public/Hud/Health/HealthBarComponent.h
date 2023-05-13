@@ -17,7 +17,6 @@ public:
 
 	void SetHealthBarPercent(float Percent);
 
-private:
 	UPROPERTY()
 		class UHealthBar* HealthBarWidget;
 };
