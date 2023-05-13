@@ -29,7 +29,7 @@ AEnemy::AEnemy()
 	GetMesh()->SetGenerateOverlapEvents(true);
 
 	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
-	//HealthBarWidget->SetupAttachment(GetRootComponent());
+	HealthBarWidget->SetupAttachment(GetMesh());
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;
@@ -49,7 +49,17 @@ AEnemy::AEnemy()
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
+	if (IsDead()) return;
+	if (EnemyState > EEnemyState::EES_Patrolling)
+	{
+		CheckCombatTarget();
+	}
+	else
+	{
+		CheckPatrolTarget();
+	}
+
 	if(GetWorld())
 	{
 		if (Player)

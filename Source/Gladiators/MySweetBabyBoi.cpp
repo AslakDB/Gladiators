@@ -239,7 +239,7 @@ void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 
 void AMySweetBabyBoi::Movement()
 {
-	//if (ActionState != EActionState::EAS_Unoccupied) return;
+	//if (ActionState == EActionState::EAS_Unoccupied) return;
 	//Movement
 	FRotator ControlRotation = Controller->GetControlRotation();
 
