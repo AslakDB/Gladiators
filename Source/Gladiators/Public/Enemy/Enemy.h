@@ -39,13 +39,11 @@ public:
 	UPROPERTY()
 		int EnemyMaxHealth;
 
-	
+
 
 	UPROPERTY(EditAnywhere)
 		ACharacter* Player = nullptr;
 
-	/*UPROPERTY(EditAnywhere)
-		TSubclassOf<ACharacter> TPlayer*/;
 protected:
 	/** <AActor> */
 	virtual void BeginPlay() override;
