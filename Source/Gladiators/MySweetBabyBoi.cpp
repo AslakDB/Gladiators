@@ -134,7 +134,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			}
 
 			// Pulled this out to its own function
-			Health -=1 * DeltaTime ;
+			
 
 			Movement();
 
