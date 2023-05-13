@@ -444,7 +444,8 @@ void AMySweetBabyBoi::PickupPotion()
 
 void AMySweetBabyBoi::SweetDeath()
 {
-	GEngine->AddOnScreenDebugMessage(5, 5, FColor::Emerald, TEXT("ThePlayerIsDead"));
+	UGameplayStatics::OpenLevel(this, "DeathScreenLevel");
+	
 }
 
 bool AMySweetBabyBoi::GetIsAttack()
