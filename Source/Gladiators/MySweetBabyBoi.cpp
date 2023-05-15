@@ -146,10 +146,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			{
 				HealthBarWidget->HealthBarWidget->AddToViewport(99);
 			}
-			else
-			{
-			GEngine->AddOnScreenDebugMessage(9, 5, FColor::Emerald, TEXT("Healbar is null"));
-			}
+			
 
 			Movement();
 
@@ -163,10 +160,8 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 			PauseWidget->RemoveFromParent();
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
-			
-			UGameplayStatics::SetGamePaused(this, false);
+			PlayerController->SetShowMouseCursor(false);
 
-			
 		}
 		
 		else
@@ -212,6 +207,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::CloseInv);
 		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);
 		EnhanceInputCom->BindAction(PauseGame, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::PausedGame);
+		EnhanceInputCom->BindAction(HealInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::HealPlayer);
 
 		/*TEST*/
 		EnhanceInputCom->BindAction(FKeyAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::FKeyPressed);
@@ -223,7 +219,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 float AMySweetBabyBoi::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Health -= DamageAmount;
-	
+	TakenDamage();
 	HandleDamage(DamageAmount);
 	return DamageAmount;
 	
@@ -638,6 +634,15 @@ void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 
 		}
 	}
+
+void AMySweetBabyBoi::HealPlayer(const FInputActionValue& input)
+{
+	if (InventoryWidget->InventoryCount != 0)
+	{
+		Attributes->Heal();
+		InventoryWidget->InventoryCount--;
+	}
+}
 
 void AMySweetBabyBoi::FKeyPressed()
 {
