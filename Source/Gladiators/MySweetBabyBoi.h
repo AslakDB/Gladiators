@@ -77,6 +77,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
 		class UInputAction* UseInput;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
+		class UInputAction* HealInput;
 
 	/*This opens and closes inventory*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
@@ -162,9 +164,12 @@ private:
 	void OpenInv(const FInputActionValue& input);
 	void CloseInv(const FInputActionValue& input);
 	void PausedGame(const FInputActionValue& input);
+	void HealPlayer(const FInputActionValue& input);
 
 	void DodgeReset();
 	void Movement();
+	
+
 	void PickupSword(ASword* SwordEquipped);
 	void PickupSpear(ASpear* SpearEquipped);
 	void PickupAxe(AAxe* AxeEquipped);
@@ -176,7 +181,9 @@ private:
 
 
 public:
-		
+	UFUNCTION(BlueprintImplementableEvent)
+		void TakenDamage();
+
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
 
