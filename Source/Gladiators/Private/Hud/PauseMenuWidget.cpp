@@ -4,19 +4,33 @@
 #include "Hud/PauseMenuWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
-#include "GameManager.h"
 
 
+
+
+void UPauseMenuWidget::NativeConstruct()
+{
+	
+	Resume->OnClicked.AddDynamic(this, &UPauseMenuWidget::ResumePlayBitch);
+	Quit->OnClicked.AddDynamic(this, &UPauseMenuWidget::QuitGameBoy);
+}
 
 void UPauseMenuWidget::PauseMenuManager()
 {
-	if (Resume->IsPressed())
-	{
-			Paused = false;
-	}
-	if (Quit->IsPressed())
-	{
-	GEngine->AddOnScreenDebugMessage(1, 7, FColor::Black, TEXT("Quit has been pressed"));
-		UGameplayStatics::OpenLevel(this,"MainMenu");
-	}
+	
+	
+}
+
+void UPauseMenuWidget::ResumePlayBitch()
+{
+
+	
+		Paused = false;
+		UGameplayStatics::SetGamePaused(this, false);
+	
+}
+
+void UPauseMenuWidget::QuitGameBoy()
+{
+	UGameplayStatics::OpenLevel(this, "MainMenu");
 }

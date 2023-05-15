@@ -13,7 +13,7 @@ AAxe::AAxe()
 	AxeCollider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	SetRootComponent(AxeCollider);
 	AxeCollider->bHiddenInGame = false;
-	AxeCollider->InitSphereRadius(100.f);
+	AxeCollider->InitSphereRadius(50.f);
 	AxeCollider->OnComponentBeginOverlap.AddDynamic(this, &AAxe::AxeOnOverlapBegin);
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(GetRootComponent());
@@ -40,8 +40,6 @@ void AAxe::AxeOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* O
 
 void AAxe::Pickup()
 {
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
 	Destroy();
 }
 

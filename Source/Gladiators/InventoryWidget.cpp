@@ -16,7 +16,7 @@ void UInventoryWidget::ManageInventory()
 		}
 		else if (InventoryCount ==1)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("InventoryCount up"));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, TEXT("InventoryCount up"));
 			Slot1->SetVisibility(ESlateVisibility::Visible);
 			Slot2->SetVisibility(ESlateVisibility::Hidden);
 			Slot3->SetVisibility(ESlateVisibility::Hidden);
@@ -27,7 +27,7 @@ void UInventoryWidget::ManageInventory()
 			Slot2->SetVisibility(ESlateVisibility::Visible);
 			Slot3->SetVisibility(ESlateVisibility::Hidden);
 		}
-		else
+		else if (InventoryCount ==3)
 		{
 			Slot3->SetVisibility(ESlateVisibility::Visible);
 			Slot1->SetVisibility(ESlateVisibility::Visible);

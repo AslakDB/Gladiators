@@ -14,7 +14,7 @@ ASword::ASword()
 	Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
 	SetRootComponent(Collider);
 	Collider->bHiddenInGame = false;
-	Collider->InitSphereRadius(100.f);
+	Collider->InitSphereRadius(50.f);
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ASword::OnOverlapBegin);
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(GetRootComponent());
@@ -43,8 +43,6 @@ void ASword::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 
 void ASword::Pickup()
 {
-	SetActorHiddenInGame(true);
-	SetActorEnableCollision(false);
 	Destroy();
 }
 

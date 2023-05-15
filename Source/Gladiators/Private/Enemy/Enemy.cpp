@@ -8,7 +8,10 @@
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
 //#include "HUD/HealthBarComponent.h"
+#include "Hud/PauseMenuWidget.h"
+#include "Gladiators/MySweetBabyBoi.h"
 #include "Items/Weapons/Weapon.h"
+#include "EngineUtils.h"
 
 AEnemy::AEnemy()
 {
@@ -30,21 +33,31 @@ AEnemy::AEnemy()
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
 	PawnSensing->SightRadius = 4000.f;
 	PawnSensing->SetPeripheralVisionAngle(45.f);
+
+	PauseMenu = CreateDefaultSubobject<UPauseMenuWidget>(TEXT("PauseMenu"));
+
+	EnemyMaxHealth = 100;
+	EnemyHealth = EnemyMaxHealth;
 }
 
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (IsDead()) return;
-	if (EnemyState > EEnemyState::EES_Patrolling)
-	{
-		CheckCombatTarget();
-	}
-	else
-	{
-		CheckPatrolTarget();
-	}
+	
+		
+			GetCharacterMovement()->MaxWalkSpeed = 300;
+			if (IsDead()) return;
+			if (EnemyState > EEnemyState::EES_Patrolling)
+			{
+				CheckCombatTarget();
+			}
+			else
+			{
+				CheckPatrolTarget();
+			}
+			
+		
+		
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -88,6 +101,12 @@ void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit)
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	/*FindAllActors(GetWorld(), AllPlayers);
+	for (int i = 0; i < AllPlayers.Num(); ++i)
+	{
+		Player = Cast<AMySweetBabyBoi>(AllPlayers[i]);
+	}*/
 
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	InitializeEnemy();
@@ -344,5 +363,8 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 		ClearPatrolTimer();
 		ChaseTarget();
 	}
+
+
 }
+
 
