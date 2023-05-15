@@ -3,12 +3,14 @@
 
 #include "Items/Weapons/Sword.h"
 #include "Components/SphereComponent.h"
+#include "Gladiators/MySweetBabyBoi.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/BoxComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Interfaces/HitInterface.h"
 
-
-// Sets default values
 ASword::ASword()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	Collider = CreateDefaultSubobject<USphereComponent>(TEXT("Collider"));
@@ -20,16 +22,13 @@ ASword::ASword()
 	StaticMesh->SetupAttachment(GetRootComponent());
 }
 
-// Called when the game starts or when spawned
 void ASword::BeginPlay()
 {
 	Super::BeginPlay();
 
 	Collider->OnComponentBeginOverlap.AddDynamic(this, &ASword::OnOverlapBegin);
-	
 }
 
-// Called every frame
 void ASword::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -38,11 +37,11 @@ void ASword::Tick(float DeltaTime)
 
 void ASword::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
 }
 
 void ASword::Pickup()
 {
 	Destroy();
 }
+
 

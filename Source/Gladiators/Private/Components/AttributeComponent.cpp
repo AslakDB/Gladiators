@@ -7,7 +7,6 @@ UAttributeComponent::UAttributeComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
-
 }
 
 void UAttributeComponent::BeginPlay()
@@ -29,6 +28,17 @@ float UAttributeComponent::GetHealthPercent()
 bool UAttributeComponent::IsAlive()
 {
 	return Health > 0.f;
+}
+
+void UAttributeComponent::AddHealthPotions(int32 NumberOfHealthPotions)
+{
+	HealthPotions += NumberOfHealthPotions;
+	Health = FMath::Clamp(Health + 20, 0.f, MaxHealth);
+}
+
+void UAttributeComponent::Heal()
+{
+	Health += MaxHealth * 0.5;
 }
 
 void UAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

@@ -3,26 +3,33 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Characters/BaseCharacter.h"
+#include "Characters/CharacterStates.h"
 #include "MySweetBabyBoi.generated.h"
 
 struct FInputActionValue;
+struct FTimerHandle;
 class UItems;
 class ASword;
 class ASpear;
 class AAxe;
 class AHealthPotion;
 
+class AItem;
+class UAnimMontage;
+
 
 UCLASS()
-class GLADIATORS_API AMySweetBabyBoi : public ACharacter
+class GLADIATORS_API AMySweetBabyBoi : public ABaseCharacter
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AMySweetBabyBoi();
-
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
 		class USpringArmComponent* SpringArm{ nullptr };
@@ -42,12 +49,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputMappingContext* MappingContext;
 
@@ -83,9 +85,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputAction* PauseGame;
 
+	/*TEST*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+	class UInputAction* FKeyAction;
+
+	UPROPERTY(EditAnywhere, Category = Input)
+	class UInputAction* AttackAction;
+
 
 	
-
 		bool GetIsAttack();
 
 		int MaxHealth;
@@ -116,17 +124,16 @@ public:
 	UFUNCTION()
 		void GetAxe();
 
-	UFUNCTION()
-		void RemoveSpear();
 
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex,
 			bool bFromSweep, const FHitResult& SweepResult);
 
+	
 	UFUNCTION()
-		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<ASword*> NearbySword;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
@@ -139,10 +146,7 @@ public:
 	UPROPERTY()
 		ASword* SwordRef;
 
-	UPROPERTY()
-		AActor* SpearRef;
-	UPROPERTY()
-		AAxe* AxeRef;
+
 
 private:
 	void Forward(const FInputActionValue& input);
@@ -158,11 +162,11 @@ private:
 	void CloseInv(const FInputActionValue& input);
 	void PausedGame(const FInputActionValue& input);
 
-
+	void DodgeReset();
 	void Movement();
-	void PickupSword();
-	void PickupSpear();
-	void PickupAxe();
+	void PickupSword(ASword* SwordEquipped);
+	void PickupSpear(ASpear* SpearEquipped);
+	void PickupAxe(AAxe* AxeEquipped);
 	void PickupPotion();
 
 	
@@ -171,12 +175,14 @@ private:
 
 
 public:
+		
+	UFUNCTION(BlueprintCallable)
+		void SweetDeath();
 
-
-	UPROPERTY(VisibleAnywhere)
+	/*UPROPERTY(VisibleAnywhere)
 		class UPlayerUserWidget* Widget = nullptr;
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<UPlayerUserWidget> TWidget;
+		TSubclassOf<UPlayerUserWidget> TWidget;*/
 
 	UPROPERTY(VisibleAnywhere)
 		class UInventoryWidget* InventoryWidget = nullptr;
@@ -187,17 +193,7 @@ public:
 		class UPauseMenuWidget* PauseWidget = nullptr;
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UPauseMenuWidget> TPauseWidget;
-
-	UPROPERTY(VisibleAnywhere)
-		class UBossWidget* CyclopsWidget = nullptr;
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<UBossWidget> TCyclopsWidget;
-
-	UPROPERTY(VisibleAnywhere)
-		class UBossWidget* ManticoreWidget = nullptr;
-
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<UBossWidget> TManticoreWidget;
+	;
 
 	UPROPERTY(VisibleAnywhere)
 		class AEnemy* Enemy;
@@ -210,17 +206,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		ASpear* SpawnSpear = nullptr;
+
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<class ASpear>Spear;
+		TSubclassOf<class ASpear> Spear;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		AAxe* SpawnAxe = nullptr;
 
 	UPROPERTY(EditAnywhere)
-		TSubclassOf<class AAxe>Axe;
+		TSubclassOf<class AAxe> Axe;
 
-	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		AActor* Potions = nullptr;*/
+	
 
 	
 
@@ -254,8 +250,71 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		bool HaveSpear;
 
+	bool IsDodging;
+	float DodgeDistance;
+	float DodgeCooldown;
+	float DodgeCooldownTime;
+	FVector DodgeDirection;
 
 	float Yaw;
 	float Pitch;
+
+protected:
+
+	void FKeyPressed();
+	//virtual void Attack() override;
+
+	/** Combat */
+	void EquipWeapon(AWeapon* Weapon);
+	void EquipSword(ASword* SwordEquip);
+	void EquipSpear(ASpear* SpearEquip);
+	void EquipAxe(AAxe* AxeEquip);
+	virtual void AttackEnd() override;
+	virtual bool CanAttack() override;
+	bool CanDisarm();
+	bool CanArm();
+	void Disarm();
+	void Arm();
+	void PlayEquipMontage(const FName& SectionName);
+
+	UFUNCTION(BlueprintCallable)
+	void HitReactEnd();
+
+	virtual void HandleDamage(float DamageAmount) override; 
+
+private:
+
+	UPROPERTY(VisibleAnywhere)
+		class UHealthBarComponent* HealthBarWidget;
+
+	UPROPERTY()
+		TSubclassOf<UHealthBarComponent> THealthBarWidget;
+	void SpawnDefaultSword();
+	void SpawnDefaultSpear();
+	void SpawnDefaultAxe();
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<class AWeapon> SwordClass;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<class AWeapon> SpearClass;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	TSubclassOf<class AWeapon> AxeClass;
+
+	UPROPERTY(VisibleInstanceOnly)
+	AItem* OverlappingItem;
+
+	UPROPERTY(EditDefaultsOnly, Category = Montages)
+	UAnimMontage* EquipMontage;
+
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+
+	UPROPERTY(BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+	EActionState ActionState = EActionState::EAS_Unoccupied;
+
+public:
+	FORCEINLINE void SetOverlappingItem(AItem* Item) { OverlappingItem = Item; }
+	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; }
 
 };

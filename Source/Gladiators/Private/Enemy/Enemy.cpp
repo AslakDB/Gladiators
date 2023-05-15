@@ -7,11 +7,18 @@
 #include "Gameframework/CharacterMovementComponent.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
-//#include "HUD/HealthBarComponent.h"
+#include "Hud/Health/HealthBarComponent.h"
 #include "Hud/PauseMenuWidget.h"
 #include "Gladiators/MySweetBabyBoi.h"
 #include "Items/Weapons/Weapon.h"
+#include "Items/Weapons/Sword.h"
+#include "Items/HealthPotion.h"
 #include "EngineUtils.h"
+#include "Hud/EnemyHealthBar.h"
+#include "Components/WidgetComponent.h"
+#include "Hud/Health/HealthBarComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 AEnemy::AEnemy()
 {
@@ -22,8 +29,8 @@ AEnemy::AEnemy()
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
-	/*HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
-	HealthBarWidget->SetupAttachment(GetRootComponent());*/
+	HealthBarWidget = CreateDefaultSubobject<UHealthBarComponent>(TEXT("HealthBar"));
+	HealthBarWidget->SetupAttachment(GetMesh());
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationPitch = false;
@@ -31,8 +38,8 @@ AEnemy::AEnemy()
 	bUseControllerRotationRoll = false;
 
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensing"));
-	PawnSensing->SightRadius = 4000.f;
-	PawnSensing->SetPeripheralVisionAngle(45.f);
+	PawnSensing->SightRadius = 15000.f;
+	PawnSensing->SetPeripheralVisionAngle(170.f);
 
 	PauseMenu = CreateDefaultSubobject<UPauseMenuWidget>(TEXT("PauseMenu"));
 
@@ -43,7 +50,41 @@ AEnemy::AEnemy()
 void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (IsDead()) return;
+	if (EnemyState > EEnemyState::EES_Patrolling)
+	{
+		CheckCombatTarget();
+	}
+	else
+	{
+		CheckPatrolTarget();
+	}
+
+	if(GetWorld())
+	{
+		if (Player)
+		{
+			GEngine->AddOnScreenDebugMessage(1, 1, FColor::Yellow, TEXT("Player is real"));
+			FVector PlayerLocation = Player->GetActorLocation();
+			FVector Location = GetActorLocation();
+			float Distance = FVector::Distance(Location, PlayerLocation);
+			
+			
+			if (Distance < 1000)
+			{
+				HealthBarWidget->SetVisibility(true);
+			}
+			else
+			{
+				HealthBarWidget->SetVisibility(false);
+				
+			}
+		}
+		
 	
+	}
+
 		
 			GetCharacterMovement()->MaxWalkSpeed = 300;
 			if (IsDead()) return;
@@ -86,16 +127,9 @@ void AEnemy::Destroyed()
 
 void AEnemy::GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit)
 {
-	ShowHealthBar();
-
-	if (IsAlive())
-	{
-		DirectionalHitReact(ImpactPoint);
-	}
-	else Die();
-
-	PlayHitSound(ImpactPoint);
-	SpawnHitParticles(ImpactPoint);
+	Super::GetHit_Implementation(ImpactPoint, ActorHit);
+	if (!IsDead()) ShowHealthBar();
+	ClearPatrolTimer();
 }
 
 void AEnemy::BeginPlay()
@@ -108,6 +142,7 @@ void AEnemy::BeginPlay()
 		Player = Cast<AMySweetBabyBoi>(AllPlayers[i]);
 	}*/
 
+	Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	InitializeEnemy();
 	Tags.Add(FName("Enemy"));
@@ -123,6 +158,22 @@ void AEnemy::Die()
 	SetLifeSpan(DeathLifeSpan);
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
+	SpawnHealthPotion();
+}
+
+void AEnemy::SpawnHealthPotion()
+{
+	UWorld* World = GetWorld();
+	if (World && HealthPotionClass && Attributes)
+	{
+		const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 0.f);
+		AHealthPotion* SpawnedHealthPotion = World->SpawnActor<AHealthPotion>(HealthPotionClass, SpawnLocation, GetActorRotation());
+		if (SpawnedHealthPotion)
+		{
+			SpawnedHealthPotion->SetHealthPotions(Attributes->GetHealthPotions());
+			SpawnedHealthPotion->SetOwner(this);
+		}
+	}
 }
 
 void AEnemy::Attack()
@@ -154,10 +205,10 @@ void AEnemy::HandleDamage(float DamageAmount)
 {
 	Super::HandleDamage(DamageAmount);
 
-	/*if (Attributes && HealthBarWidget)
+	if (Attributes && HealthBarWidget)
 	{
-		HealthBarWidget->SetHealthPercent(Attributes->GetHealthPercent());
-	}*/
+		HealthBarWidget->SetHealthBarPercent(Attributes->GetHealthPercent());
+	}
 }
 
 int32 AEnemy::PlayDeathMontage()
@@ -313,7 +364,7 @@ void AEnemy::MoveToTarget(AActor* Target)
 	if (EnemyController == nullptr || Target == nullptr) return;
 	FAIMoveRequest MoveRequest;
 	MoveRequest.SetGoalActor(Target);
-	MoveRequest.SetAcceptanceRadius(50.f);
+	MoveRequest.SetAcceptanceRadius(AcceptanceRadius);
 	EnemyController->MoveTo(MoveRequest);
 }
 
@@ -344,7 +395,7 @@ void AEnemy::SpawnDefaultWeapon()
 	if (World && WeaponClass)
 	{
 		AWeapon* DefaultWeapon = World->SpawnActor<AWeapon>(WeaponClass);
-		DefaultWeapon->Equip(GetMesh(), FName("RightHandSocket"), this, this);
+		DefaultWeapon->Equip(GetMesh(), FName("WeaponSocket"), this, this);
 		EquippedWeapon = DefaultWeapon;
 	}
 }
