@@ -29,6 +29,8 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Actor Attributes")
 		int32 HealthPotions;
 
+	
+
 public:
 	void ReceiveDamage(float Damage);
 	float GetHealthPercent();

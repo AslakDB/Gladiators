@@ -9,6 +9,7 @@
 #include "Items/Weapons/Axe.h"
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Gladiators/MySweetBabyBoi.h"
 #include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -22,7 +23,7 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	IsAliveBool = UGameplayStatics::GetPlayerCharacter(GetWorld(),0);
 }
 
 void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit)
@@ -47,6 +48,7 @@ void ABaseCharacter::Attack()
 
 void ABaseCharacter::Die()
 {
+	Cast<AMySweetBabyBoi>(IsAliveBool)->SweetAlive();
 	Tags.Add(FName("Dead"));
 	PlayDeathMontage();
 }

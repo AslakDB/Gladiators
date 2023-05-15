@@ -97,14 +97,11 @@ public:
 
 
 	
-		bool GetIsAttack();
-
-		int MaxHealth;
-			int Health;
-			bool GameIsPaused;
-
-
-		bool InventoryIsOpen;
+	//bool GetIsAttack();
+	int MaxHealth;
+	int Health;
+	bool GameIsPaused;
+	bool InventoryIsOpen;
 
 
 
@@ -146,8 +143,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<AHealthPotion*> Potions;
 
-	UPROPERTY()
-		ASword* SwordRef;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToSword;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToSpear;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToAxe;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToPotion;
 
 
 
@@ -160,6 +163,7 @@ private:
 	void HeavyAttack(const FInputActionValue& input);
 	void Dodge(const FInputActionValue& input);
 	void Use(const FInputActionValue& input);
+
 	/*Functions for open and close inventory*/
 	void OpenInv(const FInputActionValue& input);
 	void CloseInv(const FInputActionValue& input);
@@ -186,11 +190,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
-
-	/*UPROPERTY(VisibleAnywhere)
-		class UPlayerUserWidget* Widget = nullptr;
-	UPROPERTY(EditAnywhere)
-		TSubclassOf<UPlayerUserWidget> TWidget;*/
+	UFUNCTION(BlueprintCallable)
+		void SweetAlive();
 
 	UPROPERTY(VisibleAnywhere)
 		class UInventoryWidget* InventoryWidget = nullptr;
@@ -206,8 +207,15 @@ public:
 	UPROPERTY(VisibleAnywhere)
 		class AEnemy* Enemy;
 
+
+	UPROPERTY(VisibleAnywhere)
+		class ABaseCharacter* Alive;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		ASword* SpawnSword = nullptr;
+
+	UPROPERTY()
+		ASword* SwordRef;
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ASword> Sword;
@@ -246,7 +254,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		bool HeavySpearAttack;
 
-	bool IsAttack;
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
@@ -258,25 +265,26 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		bool HaveSpear;
 
-	bool IsDodging;
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
+		bool IsDodging;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool IsAlive;
+
+
 	float DodgeDistance;
 	float DodgeCooldown;
 	float DodgeCooldownTime;
 	FVector DodgeDirection;
+	FTimerHandle Timer;
 
 	float Yaw;
 	float Pitch;
 
 protected:
 
-	void FKeyPressed();
-	//virtual void Attack() override;
 
-	/** Combat */
-	void EquipWeapon(AWeapon* Weapon);
-	void EquipSword(ASword* SwordEquip);
-	void EquipSpear(ASpear* SpearEquip);
-	void EquipAxe(AAxe* AxeEquip);
+	///** Combat */
 	virtual void AttackEnd() override;
 	virtual bool CanAttack() override;
 	bool CanDisarm();
