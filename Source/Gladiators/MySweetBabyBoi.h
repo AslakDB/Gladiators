@@ -178,6 +178,8 @@ public:
 		
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
+	UFUNCTION(BlueprintCallable)
+		void DisableMovement();
 
 	/*UPROPERTY(VisibleAnywhere)
 		class UPlayerUserWidget* Widget = nullptr;

@@ -23,7 +23,8 @@ void UPauseMenuWidget::PauseMenuManager()
 
 void UPauseMenuWidget::ResumePlayBitch()
 {
-
+	/*APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	PlayerController->SetShowMouseCursor(true);*/
 	
 		Paused = false;
 		UGameplayStatics::SetGamePaused(this, false);
