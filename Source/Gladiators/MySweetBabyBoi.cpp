@@ -146,10 +146,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			{
 				HealthBarWidget->HealthBarWidget->AddToViewport(99);
 			}
-			else
-			{
-			GEngine->AddOnScreenDebugMessage(9, 5, FColor::Emerald, TEXT("Healbar is null"));
-			}
+			
 
 			Movement();
 
@@ -163,10 +160,8 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 			PauseWidget->RemoveFromParent();
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
-			
-			UGameplayStatics::SetGamePaused(this, false);
+			PlayerController->SetShowMouseCursor(false);
 
-			
 		}
 		
 		else
@@ -639,66 +634,6 @@ void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 		}
 	}
 
-void AMySweetBabyBoi::FKeyPressed()
-{
-	/*AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
-	if (OverlappingWeapon)
-	{
-		EquipWeapon(OverlappingWeapon);
-	}
-	else
-	{
-		if (CanDisarm())
-		{
-			Disarm();
-		}
-		else if (CanArm())
-		{
-			Arm();
-		}
-	}*/
-
-	ASword* OverlappingSword = Cast<ASword>(OverlappingItem);
-	if (OverlappingSword)
-	{
-		EquipSword(OverlappingSword);
-	}
-	else
-	{
-		if (CanDisarm())
-		{
-			Disarm();
-		}
-		else if (CanArm())
-		{
-			Arm();
-		}
-	}
-}
-
-//void AMySweetBabyBoi::Attack()
-//{
-//	Super::Attack();
-//	/*if (CanAttack())
-//	{
-//		PlayAttackMontage();
-//		ActionState = EActionState::EAS_Attacking;
-//	}*/
-//
-//	IsAttack = true;
-//	if (HaveSword)
-//	{
-//		SwordAttack = true;
-//	}
-//	if (HaveAxe)
-//	{
-//		AxeAttack = true;
-//	}
-//	if (HaveSpear)
-//	{
-//		SpearAttack = true;
-//	}
-//}
 
 void AMySweetBabyBoi::EquipWeapon(AWeapon* Weapon)
 {
