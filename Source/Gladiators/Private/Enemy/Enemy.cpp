@@ -65,7 +65,6 @@ void AEnemy::Tick(float DeltaTime)
 	{
 		if (Player)
 		{
-			GEngine->AddOnScreenDebugMessage(1, 1, FColor::Yellow, TEXT("Player is real"));
 			FVector PlayerLocation = Player->GetActorLocation();
 			FVector Location = GetActorLocation();
 			float Distance = FVector::Distance(Location, PlayerLocation);
