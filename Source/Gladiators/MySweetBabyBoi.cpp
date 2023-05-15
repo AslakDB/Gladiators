@@ -447,14 +447,6 @@ void AMySweetBabyBoi::SweetDeath()
 	
 }
 
-void AMySweetBabyBoi::DisableMovement()
-{
-	if (true)
-	{
-		
-	}
-}
-
 bool AMySweetBabyBoi::GetIsAttack()
 {
 	return IsAttack;
