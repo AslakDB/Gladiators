@@ -78,12 +78,12 @@ AMySweetBabyBoi::AMySweetBabyBoi()
 	
 	MaxHealth = 100;
 	Health = MaxHealth;
-	DodgeCooldownTime = 2.f;
-	DodgeDistance = 500;
+	DodgeCooldownTime = 1.f;
+	DodgeDistance = 550;
 
-	Enemy = CreateDefaultSubobject<AEnemy>(TEXT("Enemy"));
 	
-
+	IsAlive = true;
+	Enemy = CreateDefaultSubobject<AEnemy>(TEXT("Enemy"));
 }
 
 // Called when the game starts or when spawned
@@ -93,7 +93,8 @@ void AMySweetBabyBoi::BeginPlay()
 
 	Tags.Add(FName("EngagableTarget"));
 
-	GetCharacterMovement()->MaxWalkSpeed = 330.f;
+
+	GetCharacterMovement()->MaxWalkSpeed = 425.f;
 	// Add the mapping context
 	APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (PlayerController)
@@ -111,6 +112,11 @@ void AMySweetBabyBoi::BeginPlay()
 		
 		PauseWidget = CreateWidget<UPauseMenuWidget>(World, TPauseWidget);
 		InventoryWidget = CreateWidget<UInventoryWidget>(World, TInventoryWidget);
+	}
+
+	if (InventoryWidget)
+	{
+		InventoryWidget->InventoryCount = 0;
 	}
 
 	if (InventoryWidget){InventoryWidget->InventoryCount = 0;}
@@ -146,7 +152,10 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			{
 				HealthBarWidget->HealthBarWidget->AddToViewport(99);
 			}
-			
+			else
+			{
+			GEngine->AddOnScreenDebugMessage(9, 5, FColor::Emerald, TEXT("Healbar is null"));
+			}
 
 			Movement();
 
@@ -160,8 +169,8 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 			PauseWidget->RemoveFromParent();
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
-			PlayerController->SetShowMouseCursor(false);
-
+			
+			UGameplayStatics::SetGamePaused(this, false);
 		}
 		
 		else
@@ -183,43 +192,37 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		if (UEnhancedInputComponent* EnhanceInputCom = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) 
+		{
+			EnhanceInputCom->BindAction(ForwardInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Forward);
+			EnhanceInputCom->BindAction(RightInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Right);
+			EnhanceInputCom->BindAction(ForwardInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::Forward);
+			EnhanceInputCom->BindAction(RightInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::Right);
+			EnhanceInputCom->BindAction(AttackInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Attack);
+			EnhanceInputCom->BindAction(HeavyAttackInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::HeavyAttack);
+			EnhanceInputCom->BindAction(DodgeInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Dodge);
+			EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::MouseX);
+			EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::MouseY);
+			EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::MouseX);
+			EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::MouseY);
+			EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseX);
+			EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseY);
+			EnhanceInputCom->BindAction(UseInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Use);
 
-	APlayerController* PC = Cast<APlayerController>(GetController());
-	if (UEnhancedInputComponent* EnhanceInputCom = CastChecked<UEnhancedInputComponent>(PlayerInputComponent)) {
-		EnhanceInputCom->BindAction(ForwardInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Forward);
-		EnhanceInputCom->BindAction(RightInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Right);
-		EnhanceInputCom->BindAction(ForwardInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::Forward);
-		EnhanceInputCom->BindAction(RightInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::Right);
-		EnhanceInputCom->BindAction(AttackInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Attack);
-		EnhanceInputCom->BindAction(HeavyAttackInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::HeavyAttack);
-		EnhanceInputCom->BindAction(DodgeInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Dodge);
-		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::MouseX);
-		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::MouseY);
-		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::MouseX);
-		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::MouseY);
-		EnhanceInputCom->BindAction(MouseXInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseX);
-		EnhanceInputCom->BindAction(MouseYInput, ETriggerEvent::Completed, this, &AMySweetBabyBoi::MouseY);
-		EnhanceInputCom->BindAction(UseInput, ETriggerEvent::Started, this, &AMySweetBabyBoi::Use);
-
-		/*Code for input on open and close inventory*/
-		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::OpenInv);
-		EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::OpenInv);
-		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::CloseInv);
-		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);
-		EnhanceInputCom->BindAction(PauseGame, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::PausedGame);
-		EnhanceInputCom->BindAction(HealInput, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::HealPlayer);
-
-		/*TEST*/
-		EnhanceInputCom->BindAction(FKeyAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::FKeyPressed);
-		//EnhanceInputCom->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Attack);
-
-	}
+			/*Code for input on open and close inventory*/
+			EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::OpenInv);
+			EnhanceInputCom->BindAction(OpenInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::OpenInv);
+			EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::CloseInv);
+			EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);EnhanceInputCom->BindAction(PauseGame, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::PausedGame);
+		}
+	
 }
 
 float AMySweetBabyBoi::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Health -= DamageAmount;
-	TakenDamage();
+	
 	HandleDamage(DamageAmount);
 	return DamageAmount;
 	
@@ -235,67 +238,64 @@ void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 
 void AMySweetBabyBoi::Movement()
 {
-	//if (ActionState == EActionState::EAS_Unoccupied) return;
-	//Movement
-	FRotator ControlRotation = Controller->GetControlRotation();
-
-	ControlRotation.Roll = 0.f;
-	ControlRotation.Pitch = 0.f;
-
-	//Getting the direction we're looking, and the right vector = cross product of forward and up vectors
-	FVector ForwardVector = UKismetMathLibrary::GetForwardVector(ControlRotation);
-	FVector RightVector = UKismetMathLibrary::GetRightVector(ControlRotation);
-
-	ForwardVector *= InputX;
-	RightVector *= InputY;
-
-	if (!FMath::IsNearlyZero(InputX))
+	if(IsAlive)
 	{
-		AddMovementInput(ForwardVector);
+		//Movement
+		FRotator ControlRotation = Controller->GetControlRotation();
+
+		ControlRotation.Roll = 0.f;
+		ControlRotation.Pitch = 0.f;
+
+		//Getting the direction we're looking, and the right vector = cross product of forward and up vectors
+		FVector ForwardVector = UKismetMathLibrary::GetForwardVector(ControlRotation);
+		FVector RightVector = UKismetMathLibrary::GetRightVector(ControlRotation);
+
+		ForwardVector *= InputX;
+		RightVector *= InputY;
+
+		if (!FMath::IsNearlyZero(InputX))
+		{
+			AddMovementInput(ForwardVector);
+		}
+		if (!FMath::IsNearlyZero(InputY))
+		{
+			AddMovementInput(RightVector);
+		}
 	}
-	if (!FMath::IsNearlyZero(InputY))
-	{
-		AddMovementInput(RightVector);
-	}
+	
 }
 
 void AMySweetBabyBoi::Dodge(const FInputActionValue& input)
 {
+	if(IsAlive)
+	{
+		if (DodgeCooldown <= 0.f)
+		{
+			DodgeCooldown = DodgeCooldownTime;
+			UCharacterMovementComponent* movementComponent = GetCharacterMovement();
 
-	//if (DodgeCooldown <= 0.f)
-	//{
-	//	// Reset the dodge cooldown
-	//	DodgeCooldown = DodgeCooldownTime;
-
-	//	// Get the character's movement component
-	//	UCharacterMovementComponent* movementComponent = GetCharacterMovement();
-
-	//	if (movementComponent)
-	//	{
-	//		// Set the movement mode to flying to allow for more agile movement
-	//		movementComponent->SetMovementMode(MOVE_Flying);
-
-	//		// Apply movement input in the dodge direction
-	//		FVector movementInput = DodgeDirection * DodgeDistance;
-	//		movementComponent->AddInputVector(movementInput);
-	//	}
-	//	
-	//}
-	//
-	//GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Dodge Called"));
-
-
+			if (movementComponent)
+			{
+				if (movementComponent->MovementMode != MOVE_Flying)
+				{
+					movementComponent->SetMovementMode(MOVE_Flying);
+					FVector movementInput = DodgeDirection * DodgeDistance;
+					movementComponent->AddInputVector(movementInput);
+					IsDodging = true;
+					GetWorld()->GetTimerManager().SetTimer(Timer, this, &AMySweetBabyBoi::DodgeReset, 0.5f, false);
+				}
+			}
+		}
+	}
+	
 }
 
 void AMySweetBabyBoi::DodgeReset()
 {
-
-	/*UCharacterMovementComponent* movementComp = GetCharacterMovement();
-
-	movementComp->StopMovementImmediately();
-	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Koffer stoppa du ikke"));*/
+	UCharacterMovementComponent* movementComponent = GetCharacterMovement();
+	movementComponent->SetMovementMode(MOVE_Walking);
+	IsDodging = false;
 }
-
 
 void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 {
@@ -303,8 +303,7 @@ void AMySweetBabyBoi::PickupSword(ASword* SwordEquipped)
 	NearbySword.Empty();
 	SwordToDestroy->Pickup();
 	GetSword();
-
-	
+	CloseToSword = false;
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedSword = SwordEquipped;
@@ -316,7 +315,7 @@ void AMySweetBabyBoi::PickupSpear(ASpear* SpearEquipped)
 	NearbySpear.Empty();
 	SpearToDestroy->Pickup();
 	GetSpear();
-
+	CloseToSpear = false;
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedSpear = SpearEquipped;
@@ -328,7 +327,7 @@ void AMySweetBabyBoi::PickupAxe(AAxe* AxeEquipped)
 	NearbyAxe.Empty();
 	AxeToDestroy->Pickup();
 	GetAxe();
-	
+	CloseToAxe = false;
 	CharacterState = ECharacterState::ECS_EquippedWeapon;
 	OverlappingItem = nullptr;
 	EquippedAxe = AxeEquipped;
@@ -400,7 +399,7 @@ void AMySweetBabyBoi::GetAxe()
 	SpawnAxe = GetWorld()->SpawnActor<AAxe>(Axe, FVector(0, 0, 0), FRotator(90, 0, 0));
 	if (SpawnAxe)
 		SpawnAxe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("Axe"));
-
+	
 	
 	if (SwordRef)
 	{
@@ -419,7 +418,6 @@ void AMySweetBabyBoi::GetAxe()
 
 	}
 
-
 	HaveAxe = true;
 	HaveSword = false;
 	HaveSpear = false;
@@ -430,27 +428,28 @@ void AMySweetBabyBoi::PickupPotion()
 {
 	if (InventoryWidget && InventoryWidget->InventoryCount != 3)
 	{
-	AHealthPotion* PotionToDestroy = Potions[0];
-	Potions.RemoveAt(0);
-	PotionToDestroy->Pickup();
+		AHealthPotion* PotionToDestroy = Potions[0];
+		Potions.RemoveAt(0);
+		PotionToDestroy->Pickup();
 		InventoryWidget->InventoryCount++;
+		CloseToPotion = false;
 	}
 }
 
 void AMySweetBabyBoi::SweetDeath()
 {
 	UGameplayStatics::OpenLevel(this, "DeathScreenLevel");
-	
 }
 
-bool AMySweetBabyBoi::GetIsAttack()
+void AMySweetBabyBoi::SweetAlive()
 {
-	return IsAttack;
+	IsAlive = false;
 }
+
+
 
 void AMySweetBabyBoi::ResetAttack()
 {
-	IsAttack = false;
 	SwordAttack = false;
 	AxeAttack = false;
 	SpearAttack = false;
@@ -465,20 +464,30 @@ void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, A
 	if (OtherActor->IsA<ASpear>())
 	{
 		NearbySpear.Add(Cast<ASpear>(OtherActor));
+		CloseToSword = false;
+		CloseToSpear = true;
+		CloseToAxe = false;
 	}
 	if (OtherActor->IsA<AAxe>())
 	{
 		NearbyAxe.Add(Cast<AAxe>(OtherActor));
+		CloseToSword = false;
+		CloseToAxe = true;
+		CloseToSpear = false;
 	}
 	if (OtherActor->IsA<ASword>())
 	{
 		NearbySword.Add(Cast<ASword>(OtherActor));
+		CloseToSword = true;
+		CloseToSpear = false;
+		CloseToAxe = false;
 	}
 	
 	
 	if (OtherActor->IsA<AHealthPotion>())
 	{
 		Potions.Add(Cast<AHealthPotion>(OtherActor));
+		CloseToPotion = true;
 	}
 }
 
@@ -526,39 +535,45 @@ void AMySweetBabyBoi::MouseY(const FInputActionValue& input)
 
 void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 {
-	if (CanAttack())
+	if(IsAlive)
 	{
-		IsAttack = true;
-		if (HaveSword)
+		if (CanAttack())
 		{
-			SwordAttack = true;
-		}
-		if (HaveAxe)
-		{
-			AxeAttack = true;
-		}
-		if (HaveSpear)
-		{
-			SpearAttack = true;
+			if (HaveSword)
+			{
+				SwordAttack = true;
+			}
+			if (HaveAxe)
+			{
+				AxeAttack = true;
+			}
+			if (HaveSpear)
+			{
+				SpearAttack = true;
+			}
 		}
 	}
+	
 }
 
 void AMySweetBabyBoi::HeavyAttack(const FInputActionValue& input)
 {
-	IsAttack = true;
-	if (HaveSword)
+	if(IsAlive)
 	{
-		HeavySwordAttack = true;
+		if (HaveSword)
+		{
+			HeavySwordAttack = true;
+		}
+		if (HaveAxe)
+		{
+			HeavyAxeAttack = true;
+		}
+		if (HaveSpear)
+		{
+			HeavySpearAttack = true;
+		}
 	}
-	if (HaveAxe)
-	{
-		HeavyAxeAttack = true;
-	}
-	if (HaveSpear)
-	{
-		HeavySpearAttack = true;
-	}
+	
 }
 
 
@@ -631,95 +646,10 @@ void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 				GEngine->AddOnScreenDebugMessage(3, 6, FColor::Blue, TEXT("P pressed"));
 				GameIsPaused = true;
 			}
-
 		}
 	}
 
-void AMySweetBabyBoi::HealPlayer(const FInputActionValue& input)
-{
-	if (InventoryWidget->InventoryCount != 0)
-	{
-		Attributes->Heal();
-		InventoryWidget->InventoryCount--;
-	}
-}
 
-void AMySweetBabyBoi::FKeyPressed()
-{
-	/*AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
-	if (OverlappingWeapon)
-	{
-		EquipWeapon(OverlappingWeapon);
-	}
-	else
-	{
-		if (CanDisarm())
-		{
-			Disarm();
-		}
-		else if (CanArm())
-		{
-			Arm();
-		}
-	}*/
-
-	ASword* OverlappingSword = Cast<ASword>(OverlappingItem);
-	if (OverlappingSword)
-	{
-		EquipSword(OverlappingSword);
-	}
-	else
-	{
-		if (CanDisarm())
-		{
-			Disarm();
-		}
-		else if (CanArm())
-		{
-			Arm();
-		}
-	}
-}
-
-//void AMySweetBabyBoi::Attack()
-//{
-//	Super::Attack();
-//	/*if (CanAttack())
-//	{
-//		PlayAttackMontage();
-//		ActionState = EActionState::EAS_Attacking;
-//	}*/
-//
-//	IsAttack = true;
-//	if (HaveSword)
-//	{
-//		SwordAttack = true;
-//	}
-//	if (HaveAxe)
-//	{
-//		AxeAttack = true;
-//	}
-//	if (HaveSpear)
-//	{
-//		SpearAttack = true;
-//	}
-//}
-
-void AMySweetBabyBoi::EquipWeapon(AWeapon* Weapon)
-{
-	Weapon->Equip(GetMesh(), FName("Sword"), this, this);
-	CharacterState = ECharacterState::ECS_EquippedWeapon;
-	OverlappingItem = nullptr;
-	EquippedWeapon = Weapon;
-}
-
-void AMySweetBabyBoi::EquipSword(ASword* SwordEquip)
-{
-	SwordEquip->Equip(GetMesh(), FName("Sword"), this, this);
-	CharacterState = ECharacterState::ECS_EquippedWeapon;
-	OverlappingItem = nullptr;
-	EquippedSword = SwordEquip;
-}
 
 void AMySweetBabyBoi::AttackEnd()
 {
