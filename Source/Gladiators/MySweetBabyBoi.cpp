@@ -634,66 +634,6 @@ void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 		}
 	}
 
-void AMySweetBabyBoi::FKeyPressed()
-{
-	/*AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
-	if (OverlappingWeapon)
-	{
-		EquipWeapon(OverlappingWeapon);
-	}
-	else
-	{
-		if (CanDisarm())
-		{
-			Disarm();
-		}
-		else if (CanArm())
-		{
-			Arm();
-		}
-	}*/
-
-	ASword* OverlappingSword = Cast<ASword>(OverlappingItem);
-	if (OverlappingSword)
-	{
-		EquipSword(OverlappingSword);
-	}
-	else
-	{
-		if (CanDisarm())
-		{
-			Disarm();
-		}
-		else if (CanArm())
-		{
-			Arm();
-		}
-	}
-}
-
-//void AMySweetBabyBoi::Attack()
-//{
-//	Super::Attack();
-//	/*if (CanAttack())
-//	{
-//		PlayAttackMontage();
-//		ActionState = EActionState::EAS_Attacking;
-//	}*/
-//
-//	IsAttack = true;
-//	if (HaveSword)
-//	{
-//		SwordAttack = true;
-//	}
-//	if (HaveAxe)
-//	{
-//		AxeAttack = true;
-//	}
-//	if (HaveSpear)
-//	{
-//		SpearAttack = true;
-//	}
-//}
 
 void AMySweetBabyBoi::EquipWeapon(AWeapon* Weapon)
 {
