@@ -33,19 +33,9 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		class UPauseMenuWidget* PauseMenu;
 
-	/*values of health*/
-	UPROPERTY()
-		int EnemyHealth;
-	UPROPERTY()
-		int EnemyMaxHealth;
-
-	
-
 	UPROPERTY(EditAnywhere)
 		ACharacter* Player = nullptr;
 
-	/*UPROPERTY(EditAnywhere)
-		TSubclassOf<ACharacter> TPlayer*/;
 protected:
 	/** <AActor> */
 	virtual void BeginPlay() override;
@@ -102,15 +92,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TSubclassOf<class AWeapon> WeaponClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ASword> SwordClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ASpear> SpearClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AAxe> AxeClass;
 
 	UPROPERTY()
 	AActor* CombatTarget;

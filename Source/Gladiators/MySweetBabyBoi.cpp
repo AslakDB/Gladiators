@@ -212,11 +212,6 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::CloseInv);
 		EnhanceInputCom->BindAction(CloseInventory, ETriggerEvent::Completed, this, &AMySweetBabyBoi::CloseInv);
 		EnhanceInputCom->BindAction(PauseGame, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::PausedGame);
-
-		/*TEST*/
-		EnhanceInputCom->BindAction(FKeyAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::FKeyPressed);
-		//EnhanceInputCom->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AMySweetBabyBoi::Attack);
-
 	}
 }
 
@@ -533,6 +528,7 @@ void AMySweetBabyBoi::Attack(const FInputActionValue& input)
 {
 	if (CanAttack())
 	{
+		ActionState = EActionState::EAS_Attacking;
 		IsAttack = true;
 		if (HaveSword)
 		{
@@ -641,83 +637,6 @@ void AMySweetBabyBoi::PausedGame(const FInputActionValue & input)
 
 		}
 	}
-
-void AMySweetBabyBoi::FKeyPressed()
-{
-	/*AWeapon* OverlappingWeapon = Cast<AWeapon>(OverlappingItem);
-	if (OverlappingWeapon)
-	{
-		EquipWeapon(OverlappingWeapon);
-	}
-	else
-	{
-		if (CanDisarm())
-		{
-			Disarm();
-		}
-		else if (CanArm())
-		{
-			Arm();
-		}
-	}*/
-
-	ASword* OverlappingSword = Cast<ASword>(OverlappingItem);
-	if (OverlappingSword)
-	{
-		EquipSword(OverlappingSword);
-	}
-	else
-	{
-		if (CanDisarm())
-		{
-			Disarm();
-		}
-		else if (CanArm())
-		{
-			Arm();
-		}
-	}
-}
-
-//void AMySweetBabyBoi::Attack()
-//{
-//	Super::Attack();
-//	/*if (CanAttack())
-//	{
-//		PlayAttackMontage();
-//		ActionState = EActionState::EAS_Attacking;
-//	}*/
-//
-//	IsAttack = true;
-//	if (HaveSword)
-//	{
-//		SwordAttack = true;
-//	}
-//	if (HaveAxe)
-//	{
-//		AxeAttack = true;
-//	}
-//	if (HaveSpear)
-//	{
-//		SpearAttack = true;
-//	}
-//}
-
-void AMySweetBabyBoi::EquipWeapon(AWeapon* Weapon)
-{
-	Weapon->Equip(GetMesh(), FName("Sword"), this, this);
-	CharacterState = ECharacterState::ECS_EquippedWeapon;
-	OverlappingItem = nullptr;
-	EquippedWeapon = Weapon;
-}
-
-void AMySweetBabyBoi::EquipSword(ASword* SwordEquip)
-{
-	SwordEquip->Equip(GetMesh(), FName("Sword"), this, this);
-	CharacterState = ECharacterState::ECS_EquippedWeapon;
-	OverlappingItem = nullptr;
-	EquippedSword = SwordEquip;
-}
 
 void AMySweetBabyBoi::AttackEnd()
 {

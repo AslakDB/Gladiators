@@ -41,9 +41,6 @@ AEnemy::AEnemy()
 	PawnSensing->SetPeripheralVisionAngle(170.f);
 
 	PauseMenu = CreateDefaultSubobject<UPauseMenuWidget>(TEXT("PauseMenu"));
-
-	EnemyMaxHealth = 100;
-	EnemyHealth = EnemyMaxHealth;
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -135,12 +132,6 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*FindAllActors(GetWorld(), AllPlayers);
-	for (int i = 0; i < AllPlayers.Num(); ++i)
-	{
-		Player = Cast<AMySweetBabyBoi>(AllPlayers[i]);
-	}*/
-
 	Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
 	InitializeEnemy();
@@ -158,6 +149,8 @@ void AEnemy::Die()
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetWeaponCollisionEnabled(ECollisionEnabled::NoCollision);
 	SpawnHealthPotion();
+	DisableMeshCollision();
+	DisableCapsule();
 }
 
 void AEnemy::SpawnHealthPotion()
@@ -265,18 +258,10 @@ void AEnemy::PatrolTimerFinished()
 
 void AEnemy::HideHealthBar()
 {
-	/*if (HealthBarWidget)
-	{
-		HealthBarWidget->SetVisibility(false);
-	}*/
 }
 
 void AEnemy::ShowHealthBar()
 {
-	/*if (HealthBarWidget)
-	{
-		HealthBarWidget->SetVisibility(true);
-	}*/
 }
 
 void AEnemy::LoseInterest()
@@ -413,8 +398,6 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 		ClearPatrolTimer();
 		ChaseTarget();
 	}
-
-
 }
 
 

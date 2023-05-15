@@ -39,10 +39,6 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* A
 
 void ABaseCharacter::Attack()
 {
-	/*if (CombatTarget && CombatTarget->ActorHasTag(FName("Dead")))
-	{
-		CombatTarget = nullptr;
-	}*/
 }
 
 void ABaseCharacter::Die()
@@ -199,24 +195,6 @@ void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type Collision
 	{
 		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
 		EquippedWeapon->IgnoreActors.Empty();
-	}
-
-	if (EquippedSword && EquippedSword->GetWeaponBox())
-	{
-		EquippedSword->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedSword->IgnoreActors.Empty();
-	}
-
-	if (EquippedSpear && EquippedSpear->GetWeaponBox())
-	{
-		EquippedSpear->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedSpear->IgnoreActors.Empty();
-	}
-
-	if (EquippedAxe && EquippedAxe->GetWeaponBox())
-	{
-		EquippedAxe->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedAxe->IgnoreActors.Empty();
 	}
 }
 
