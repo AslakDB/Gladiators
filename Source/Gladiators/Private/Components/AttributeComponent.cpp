@@ -3,6 +3,8 @@
 
 #include "Components/AttributeComponent.h"
 
+#include "Gladiators/MySweetBabyBoi.h"
+
 UAttributeComponent::UAttributeComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -18,6 +20,7 @@ void UAttributeComponent::BeginPlay()
 void UAttributeComponent::ReceiveDamage(float Damage)
 {
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	
 }
 
 float UAttributeComponent::GetHealthPercent()
@@ -27,6 +30,7 @@ float UAttributeComponent::GetHealthPercent()
 
 bool UAttributeComponent::IsAlive()
 {
+
 	return Health > 0.f;
 }
 

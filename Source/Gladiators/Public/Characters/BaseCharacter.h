@@ -12,6 +12,7 @@ class AWeapon;
 class ASword;
 class ASpear;
 class AAxe;
+class AMySweetBabyBoi;
 class UAttributeComponent;
 class UAnimMontage;
 
@@ -61,6 +62,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	AAxe* EquippedAxe;
+
+	UPROPERTY(VisibleAnywhere)
+		ACharacter* IsAliveBool;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAttributeComponent* Attributes;

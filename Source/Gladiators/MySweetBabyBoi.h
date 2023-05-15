@@ -140,8 +140,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 		TArray<AHealthPotion*> Potions;
 
-	UPROPERTY()
-		ASword* SwordRef;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToSword;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToSpear;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToAxe;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToPotion;
 
 
 
@@ -176,7 +182,8 @@ public:
 		
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
-
+	UFUNCTION(BlueprintCallable)
+		void SweetAlive();
 
 	UPROPERTY(VisibleAnywhere)
 		class UInventoryWidget* InventoryWidget = nullptr;
@@ -192,8 +199,15 @@ public:
 	UPROPERTY(VisibleAnywhere)
 		class AEnemy* Enemy;
 
+
+	UPROPERTY(VisibleAnywhere)
+		class ABaseCharacter* Alive;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		ASword* SpawnSword = nullptr;
+
+	UPROPERTY()
+		ASword* SwordRef;
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ASword> Sword;
@@ -232,7 +246,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 		bool HeavySpearAttack;
 
-	bool IsAttack;
 	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
@@ -246,6 +259,9 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		bool IsDodging;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool IsAlive;
 
 
 	float DodgeDistance;
