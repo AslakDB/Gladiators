@@ -24,6 +24,9 @@ public:
 	ABaseCharacter();
 	virtual void Tick(float DeltaTime) override;
 
+	void RemoveEnemies();
+	bool IsRemainingEnemies();
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
@@ -43,6 +46,8 @@ protected:
 	virtual int32 PlayAttackMontage();
 	virtual int32 PlayDeathMontage();
 	void StopAttackMontage();
+
+	void CheckNumberOfEnemies();
 
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackEnd();
@@ -92,6 +97,12 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TArray<FName> DeathMontageSections;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	float NumberOfEnemies = 1;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	float MaxNumberOfEnemies = 1;
 
 public:
 	FORCEINLINE TEnumAsByte<EDeathPose> GetDeathPose() const { return DeathPose; }

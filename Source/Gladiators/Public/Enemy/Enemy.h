@@ -54,6 +54,8 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
 
+	void SpawnTriggerSphere();
+
 private:
 
 	/** AI Behavior */
@@ -86,6 +88,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* HealthBarWidget;
+
+	UPROPERTY(VisibleAnywhere)
+	TSubclassOf<class ATriggerSphere> TriggerSphere;
 
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensing;

@@ -18,6 +18,7 @@
 #include "Components/WidgetComponent.h"
 #include "Hud/Health/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/TriggerSphere.h"
 
 AEnemy::AEnemy()
 {
@@ -41,6 +42,8 @@ AEnemy::AEnemy()
 	PawnSensing->SetPeripheralVisionAngle(170.f);
 
 	PauseMenu = CreateDefaultSubobject<UPauseMenuWidget>(TEXT("PauseMenu"));
+
+	//TriggerSphere-> = CreateDefaultSubobject<ATriggerSphere>(TEXT("TriggerSphere"));
 }
 
 void AEnemy::Tick(float DeltaTime)
@@ -151,6 +154,7 @@ void AEnemy::Die()
 	SpawnHealthPotion();
 	DisableMeshCollision();
 	DisableCapsule();
+	CheckNumberOfEnemies();
 }
 
 void AEnemy::SpawnHealthPotion()
@@ -212,6 +216,21 @@ int32 AEnemy::PlayDeathMontage()
 		DeathPose = Pose;
 	}
 	return Selection;
+}
+
+void AEnemy::SpawnTriggerSphere()
+{
+	/*UWorld* World = GetWorld();
+	if (World && TriggerSphere)
+	{
+		const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 0.f);
+		ATriggerSphere* SpawnedTriggerSphere = World->SpawnActor<AHealthPotion>(HealthPotionClass, SpawnLocation, GetActorRotation());
+		if (SpawnedTriggerSphere)
+		{
+			SpawnedTriggerSphere->SetHealthPotions(Attributes->GetHealthPotions());
+			SpawnedTriggerSphere->SetOwner(this);
+		}
+	}*/
 }
 
 void AEnemy::InitializeEnemy()

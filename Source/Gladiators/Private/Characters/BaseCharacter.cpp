@@ -142,6 +142,21 @@ int32 ABaseCharacter::PlayRandomMontageSection(UAnimMontage* Montage, const TArr
 	return Selection;
 }
 
+void ABaseCharacter::CheckNumberOfEnemies()
+{
+	FString CurrentLevel = GetWorld()->GetMapName();
+
+	/*if (IsRemainingEnemies())
+	{
+		RemoveEnemies();
+	}*//*!IsRemainingEnemies() && */
+
+	if (CurrentLevel == "Gladiators1")
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "MainMenu");
+	}
+}
+
 int32 ABaseCharacter::PlayAttackMontage()
 {
 	return PlayRandomMontageSection(AttackMontage, AttackMontageSections);
@@ -187,6 +202,17 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ABaseCharacter::RemoveEnemies()
+{
+	NumberOfEnemies = FMath::Clamp(NumberOfEnemies - 1.f, 0.f, MaxNumberOfEnemies);
+	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Removed Enemies"));
+}
+
+bool ABaseCharacter::IsRemainingEnemies()
+{
+	return NumberOfEnemies > 0.f;
 }
 
 void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
