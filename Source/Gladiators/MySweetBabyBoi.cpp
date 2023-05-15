@@ -417,7 +417,6 @@ void AMySweetBabyBoi::PickupPotion()
 {
 	if (InventoryWidget && InventoryWidget->InventoryCount != 3)
 	{
-		GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Picking up potions"));
 		AHealthPotion* PotionToDestroy = Potions[0];
 		Potions.RemoveAt(0);
 		PotionToDestroy->Pickup();
@@ -582,7 +581,7 @@ void AMySweetBabyBoi::Use(const FInputActionValue& input)
 	}
 	if (InventoryWidget->IsInViewport() && InventoryWidget->InventoryCount !=0)
 	{
-		Health = MaxHealth;
+		Attributes->Heal();
 		InventoryWidget->InventoryCount--;
 	}
 }
