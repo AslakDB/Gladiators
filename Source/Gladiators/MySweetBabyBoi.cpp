@@ -146,10 +146,7 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 			{
 				HealthBarWidget->HealthBarWidget->AddToViewport(99);
 			}
-			else
-			{
-			GEngine->AddOnScreenDebugMessage(9, 5, FColor::Emerald, TEXT("Healbar is null"));
-			}
+			
 
 			Movement();
 
@@ -163,10 +160,8 @@ void AMySweetBabyBoi::Tick(float DeltaTime)
 
 			PauseWidget->RemoveFromParent();
 			APlayerController* PlayerController = Cast<APlayerController>(Controller);
-			
-			UGameplayStatics::SetGamePaused(this, false);
+			PlayerController->SetShowMouseCursor(false);
 
-			
 		}
 		
 		else
