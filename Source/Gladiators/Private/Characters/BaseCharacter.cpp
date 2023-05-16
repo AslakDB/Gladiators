@@ -51,7 +51,6 @@ void ABaseCharacter::Attack()
 
 void ABaseCharacter::Die_Implementation()
 {
-	Cast<AMySweetBabyBoi>(IsAliveBool)->SweetAlive();
 	Tags.Add(FName("Dead"));
 	PlayDeathMontage();
 }
