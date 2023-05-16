@@ -15,6 +15,7 @@
 #include "BossWidget.h"
 #include "Public/Enemy/Enemy.h"
 #include "Engine/EngineTypes.h"
+#include "Sound/SoundCue.h"
 
 #include "InventoryWidget.h"
 #include "Public/Hud/PauseMenuWidget.h"
@@ -649,6 +650,7 @@ void AMySweetBabyBoi::HealPlayer(const FInputActionValue& input)
 {
 	if (InventoryWidget->InventoryCount != 0)
 	{
+		UGameplayStatics::PlaySound2D(this, SoundCue, 0.5, 1);
 		Attributes->Heal();
 		InventoryWidget->InventoryCount--;
 	}

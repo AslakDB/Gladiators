@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
+#include "Interfaces/HitInterface.h"
 #include "Characters/CharacterStates.h"
 #include "Enemy.generated.h"
 
@@ -33,14 +34,6 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 		class UPauseMenuWidget* PauseMenu;
 
-	/*values of health*/
-	UPROPERTY()
-		int EnemyHealth;
-	UPROPERTY()
-		int EnemyMaxHealth;
-
-
-
 	UPROPERTY(EditAnywhere)
 		ACharacter* Player = nullptr;
 
@@ -50,7 +43,9 @@ protected:
 	/** </AActor> */
 
 	/** <ABaseCharacter> */
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
+	//virtual void Die() override;
+	virtual void Killed_Implementation() override;
 	void SpawnHealthPotion();
 	virtual void Attack() override;
 	virtual bool CanAttack() override;
@@ -61,6 +56,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
+
+	void SpawnTriggerSphere();
 
 private:
 
@@ -96,19 +93,13 @@ private:
 	UHealthBarComponent* HealthBarWidget;
 
 	UPROPERTY(VisibleAnywhere)
+	TSubclassOf<class ATriggerSphere> TriggerSphere;
+
+	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensing;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TSubclassOf<class AWeapon> WeaponClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ASword> SwordClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ASpear> SpearClass;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AAxe> AxeClass;
 
 	UPROPERTY()
 	AActor* CombatTarget;
@@ -153,6 +144,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float AttackMax = 1.f;
+
+	FTimerHandle InitializeTimer;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	float InitializeTime;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float ChasingSpeed = 300.f;
