@@ -118,6 +118,7 @@ private:
 	bool GameIsPaused;
 	bool InventoryIsOpen;
 
+public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "BabyVariables | Animation")
 		float InputX;
 
@@ -207,7 +208,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool IsDodging;
 
-public:
 	UFUNCTION(BlueprintImplementableEvent)
 		void TakenDamage();
 
