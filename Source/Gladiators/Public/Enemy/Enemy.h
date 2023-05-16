@@ -45,7 +45,6 @@ protected:
 	/** <ABaseCharacter> */
 	virtual void Die_Implementation() override;
 	//virtual void Die() override;
-	virtual void Killed_Implementation() override;
 	void SpawnHealthPotion();
 	virtual void Attack() override;
 	virtual bool CanAttack() override;
@@ -56,8 +55,6 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	EEnemyState EnemyState = EEnemyState::EES_Patrolling;
-
-	void SpawnTriggerSphere();
 
 private:
 
@@ -91,9 +88,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UHealthBarComponent* HealthBarWidget;
-
-	UPROPERTY(VisibleAnywhere)
-	TSubclassOf<class ATriggerSphere> TriggerSphere;
 
 	UPROPERTY(VisibleAnywhere)
 	UPawnSensingComponent* PawnSensing;
@@ -148,7 +142,7 @@ private:
 	FTimerHandle InitializeTimer;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	float InitializeTime;
+	float InitializeTime = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float ChasingSpeed = 300.f;

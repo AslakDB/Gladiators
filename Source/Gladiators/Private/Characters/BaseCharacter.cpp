@@ -4,13 +4,9 @@
 #include "Characters/BaseCharacter.h"
 #include "Components/BoxComponent.h"
 #include "Items/Weapons/Weapon.h"
-#include "Items/Weapons/Sword.h"
-#include "Items/Weapons/Spear.h"
-#include "Items/Weapons/Axe.h"
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Gladiators/MySweetBabyBoi.h"
-#include "Gamemode/MyGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -34,15 +30,6 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* A
 		DirectionalHitReact(ActorHit->GetActorLocation());
 	}
 	else Die();
-
-
-	//PlayHitSound(ImpactPoint);
-	//SpawnHitParticles(ImpactPoint);
-}
-
-void ABaseCharacter::Killed_Implementation()
-{
-
 }
 
 void ABaseCharacter::Attack()
@@ -150,21 +137,6 @@ int32 ABaseCharacter::PlayRandomMontageSection(UAnimMontage* Montage, const TArr
 	return Selection;
 }
 
-void ABaseCharacter::CheckNumberOfEnemies()
-{
-	//FString CurrentLevel = GetWorld()->GetMapName();
-
-	///*if (IsRemainingEnemies())
-	//{
-	//	RemoveEnemies();
-	//}*//*!IsRemainingEnemies() && */
-
-	//if (CurrentLevel == "Gladiators1")
-	//{
-	//	UGameplayStatics::OpenLevel(GetWorld(), "MainMenu");
-	//}
-}
-
 int32 ABaseCharacter::PlayAttackMontage()
 {
 	return PlayRandomMontageSection(AttackMontage, AttackMontageSections);
@@ -210,36 +182,6 @@ void ABaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-}
-
-void ABaseCharacter::RemoveEnemies()
-{
-	EnemiesAlive--;
-	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Removed Enemies"));
-}
-
-void ABaseCharacter::ChangeLevel()
-{
-	UWorld* World = GetWorld();
-	FString CurrentLevel = World->GetMapName();
-
-	if (World && !IsEnemiesLeft())
-	{
-		UGameplayStatics::OpenLevel(GetWorld(), "Gladiators1");
-	}
-	/*else if (World && !IsEnemiesLeft() && CurrentLevel == "Gladiators1")
-	{
-		UGameplayStatics::OpenLevel(GetWorld(), "EnemyTest");
-	}*/
-	/*else if (World && !IsEnemiesLeft() && CurrentLevel == "Level2")
-	{
-		UGameplayStatics::OpenLevel(GetWorld(), "Level3");
-	}*/
-}
-
-bool ABaseCharacter::IsEnemiesLeft()
-{
-	return EnemiesAlive > 0.f;
 }
 
 void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
