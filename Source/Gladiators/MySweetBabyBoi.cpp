@@ -237,6 +237,12 @@ void AMySweetBabyBoi::GetHit_Implementation(const FVector& ImpactPoint, AActor* 
 	ActionState = EActionState::EAS_HitReaction;
 }
 
+void AMySweetBabyBoi::Die_Implementation()
+{
+	Super::Die_Implementation();
+	IsAlive = false;
+}
+
 void AMySweetBabyBoi::Movement()
 {
 	if(IsAlive)
