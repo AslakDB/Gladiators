@@ -89,9 +89,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputAction* PauseGame;
 
-	/*TEST*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	class UInputAction* FKeyAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* AttackAction;

@@ -30,6 +30,8 @@ private:
 		int32 HealthPotions;
 
 	
+	/*UPROPERTY(EditAnywhere, Category = Combat)
+		float EnemiesAlive = 3.f;*/
 
 public:
 	void ReceiveDamage(float Damage);
@@ -37,5 +39,9 @@ public:
 	bool IsAlive();
 	void AddHealthPotions(int32 NumberOfHealthPotions);
 	void Heal();
+
+	/*void RemoveEnemies();
+	bool IsEnemiesLeft();*/
+
 	FORCEINLINE int32 GetHealthPotions() const { return HealthPotions; }
 };

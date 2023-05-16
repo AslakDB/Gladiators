@@ -10,6 +10,7 @@
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Gladiators/MySweetBabyBoi.h"
+#include "Gamemode/MyGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -34,19 +35,21 @@ void ABaseCharacter::GetHit_Implementation(const FVector& ImpactPoint, AActor* A
 	}
 	else Die();
 
+
 	//PlayHitSound(ImpactPoint);
 	//SpawnHitParticles(ImpactPoint);
 }
 
-void ABaseCharacter::Attack()
+void ABaseCharacter::Killed_Implementation()
 {
-	/*if (CombatTarget && CombatTarget->ActorHasTag(FName("Dead")))
-	{
-		CombatTarget = nullptr;
-	}*/
+
 }
 
-void ABaseCharacter::Die()
+void ABaseCharacter::Attack()
+{
+}
+
+void ABaseCharacter::Die_Implementation()
 {
 	Cast<AMySweetBabyBoi>(IsAliveBool)->SweetAlive();
 	Tags.Add(FName("Dead"));
@@ -148,6 +151,21 @@ int32 ABaseCharacter::PlayRandomMontageSection(UAnimMontage* Montage, const TArr
 	return Selection;
 }
 
+void ABaseCharacter::CheckNumberOfEnemies()
+{
+	//FString CurrentLevel = GetWorld()->GetMapName();
+
+	///*if (IsRemainingEnemies())
+	//{
+	//	RemoveEnemies();
+	//}*//*!IsRemainingEnemies() && */
+
+	//if (CurrentLevel == "Gladiators1")
+	//{
+	//	UGameplayStatics::OpenLevel(GetWorld(), "MainMenu");
+	//}
+}
+
 int32 ABaseCharacter::PlayAttackMontage()
 {
 	return PlayRandomMontageSection(AttackMontage, AttackMontageSections);
@@ -195,30 +213,42 @@ void ABaseCharacter::Tick(float DeltaTime)
 
 }
 
+void ABaseCharacter::RemoveEnemies()
+{
+	EnemiesAlive--;
+	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Removed Enemies"));
+}
+
+void ABaseCharacter::ChangeLevel()
+{
+	UWorld* World = GetWorld();
+	FString CurrentLevel = World->GetMapName();
+
+	if (World && !IsEnemiesLeft())
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "Gladiators1");
+	}
+	/*else if (World && !IsEnemiesLeft() && CurrentLevel == "Gladiators1")
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "EnemyTest");
+	}*/
+	/*else if (World && !IsEnemiesLeft() && CurrentLevel == "Level2")
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), "Level3");
+	}*/
+}
+
+bool ABaseCharacter::IsEnemiesLeft()
+{
+	return EnemiesAlive > 0.f;
+}
+
 void ABaseCharacter::SetWeaponCollisionEnabled(ECollisionEnabled::Type CollisionEnabled)
 {
 	if (EquippedWeapon && EquippedWeapon->GetWeaponBox())
 	{
 		EquippedWeapon->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
 		EquippedWeapon->IgnoreActors.Empty();
-	}
-
-	if (EquippedSword && EquippedSword->GetWeaponBox())
-	{
-		EquippedSword->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedSword->IgnoreActors.Empty();
-	}
-
-	if (EquippedSpear && EquippedSpear->GetWeaponBox())
-	{
-		EquippedSpear->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedSpear->IgnoreActors.Empty();
-	}
-
-	if (EquippedAxe && EquippedAxe->GetWeaponBox())
-	{
-		EquippedAxe->GetWeaponBox()->SetCollisionEnabled(CollisionEnabled);
-		EquippedAxe->IgnoreActors.Empty();
 	}
 }
 
