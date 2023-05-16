@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Characters/BaseCharacter.h"
+#include "Interfaces/HitInterface.h"
 #include "Characters/CharacterStates.h"
 #include "Enemy.generated.h"
 
@@ -42,7 +43,9 @@ protected:
 	/** </AActor> */
 
 	/** <ABaseCharacter> */
-	virtual void Die() override;
+	virtual void Die_Implementation() override;
+	//virtual void Die() override;
+	virtual void Killed_Implementation() override;
 	void SpawnHealthPotion();
 	virtual void Attack() override;
 	virtual bool CanAttack() override;
@@ -141,6 +144,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float AttackMax = 1.f;
+
+	FTimerHandle InitializeTimer;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	float InitializeTime;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float ChasingSpeed = 300.f;

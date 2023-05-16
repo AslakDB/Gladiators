@@ -14,6 +14,7 @@ class ASpear;
 class AAxe;
 class UAttributeComponent;
 class UAnimMontage;
+class AMyGameModeBase;
 
 UCLASS()
 class GLADIATORS_API ABaseCharacter : public ACharacter, public IHitInterface
@@ -24,14 +25,22 @@ public:
 	ABaseCharacter();
 	virtual void Tick(float DeltaTime) override;
 
+	void ChangeLevel();
 	void RemoveEnemies();
-	bool IsRemainingEnemies();
+	bool IsEnemiesLeft();
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
 	virtual void Attack();
-	virtual void Die();
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void Die();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Killed();
+
+	//virtual void Die();
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	virtual void HandleDamage(float DamageAmount);
 	void PlayHitSound(const FVector& ImpactPoint);
@@ -40,8 +49,6 @@ protected:
 	virtual bool CanAttack();
 	bool IsAlive();
 	void DisableMeshCollision();
-
-
 	void PlayHitReactMontage(const FName& SectionName);
 	virtual int32 PlayAttackMontage();
 	virtual int32 PlayDeathMontage();
@@ -69,6 +76,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAttributeComponent* Attributes;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	AMyGameModeBase* GameMode;
 
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<EDeathPose> DeathPose;
@@ -99,10 +109,7 @@ private:
 	TArray<FName> DeathMontageSections;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	float NumberOfEnemies = 1;
-
-	UPROPERTY(EditAnywhere, Category = Combat)
-	float MaxNumberOfEnemies = 1;
+	float EnemiesAlive = 3.f;
 
 public:
 	FORCEINLINE TEnumAsByte<EDeathPose> GetDeathPose() const { return DeathPose; }

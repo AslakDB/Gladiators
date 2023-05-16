@@ -7,6 +7,7 @@
 #include "Gameframework/CharacterMovementComponent.h"
 #include "Perception/PawnSensingComponent.h"
 #include "Components/AttributeComponent.h"
+#include "Gamemode/MyGameModeBase.h"
 #include "Hud/Health/HealthBarComponent.h"
 #include "Hud/PauseMenuWidget.h"
 #include "Gladiators/MySweetBabyBoi.h"
@@ -97,7 +98,7 @@ void AEnemy::Tick(float DeltaTime)
 			}
 			
 		
-		
+	
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -137,12 +138,15 @@ void AEnemy::BeginPlay()
 
 	Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (PawnSensing) PawnSensing->OnSeePawn.AddDynamic(this, &AEnemy::PawnSeen);
-	InitializeEnemy();
+	//InitializeEnemy();
+	GetWorldTimerManager().SetTimer(InitializeTimer, this, &AEnemy::InitializeEnemy, InitializeTime);
 	Tags.Add(FName("Enemy"));
 }
 
-void AEnemy::Die()
+void AEnemy::Die_Implementation()
 {
+	Super::Die_Implementation();
+
 	EnemyState = EEnemyState::EES_Dead;
 	PlayDeathMontage();
 	ClearAttackTimer();
@@ -154,7 +158,14 @@ void AEnemy::Die()
 	SpawnHealthPotion();
 	DisableMeshCollision();
 	DisableCapsule();
-	CheckNumberOfEnemies();
+	/*Killed_Implementation();
+	RemoveEnemies();
+	ChangeLevel();*/
+}
+
+void AEnemy::Killed_Implementation()
+{
+	Super::Killed_Implementation();
 }
 
 void AEnemy::SpawnHealthPotion()
@@ -408,7 +419,7 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 	const bool bShouldChaseTarget =
 		EnemyState != EEnemyState::EES_Dead &&
 		EnemyState != EEnemyState::EES_Chasing &&
-		EnemyState < EEnemyState::EES_Attacking&&
+		EnemyState < EEnemyState::EES_Attacking &&
 		SeenPawn->ActorHasTag(FName("EngagableTarget"));
 
 	if (bShouldChaseTarget)
@@ -418,5 +429,4 @@ void AEnemy::PawnSeen(APawn* SeenPawn)
 		ChaseTarget();
 	}
 }
-
 
