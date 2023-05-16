@@ -142,7 +142,7 @@ private:
 	FTimerHandle InitializeTimer;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	float InitializeTime;
+	float InitializeTime = 1.f;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float ChasingSpeed = 300.f;
