@@ -91,68 +91,7 @@ public:
 		class UInputAction* PauseGame;
 
 
-	UPROPERTY(EditAnywhere, Category = Input)
-	class UInputAction* AttackAction;
-
-
-	
-	//bool GetIsAttack();
-	int MaxHealth;
-	int Health;
-	bool GameIsPaused;
-	bool InventoryIsOpen;
-
-
-
-	UFUNCTION()
-		void ResetAttack();
-
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "BabyVariables | Animation")
-		float InputX;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "BabyVariables | Animation")
-		float InputY;
-
-	UFUNCTION()
-		void GetSword();
-
-	UFUNCTION()
-		void GetSpear();
-
-	UFUNCTION()
-		void GetAxe();
-
-
-	UFUNCTION()
-		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex,
-			bool bFromSweep, const FHitResult& SweepResult);
-
-	
-	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-		UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
-		TArray<ASword*> NearbySword;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
-		TArray<ASpear*> NearbySpear;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
-		TArray<AAxe*> NearbyAxe;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
-		TArray<AHealthPotion*> Potions;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool CloseToSword;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool CloseToSpear;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool CloseToAxe;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool CloseToPotion;
-
-
-
+	//Input
 private:
 	void Forward(const FInputActionValue& input);
 	void Right(const FInputActionValue& input);
@@ -171,17 +110,103 @@ private:
 
 	void DodgeReset();
 	void Movement();
-	
 
+
+	
+	//bool GetIsAttack();
+	int MaxHealth;
+	int Health;
+	bool GameIsPaused;
+	bool InventoryIsOpen;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "BabyVariables | Animation")
+		float InputX;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "BabyVariables | Animation")
+		float InputY;
+
+
+	// pickup functions
+	void GetSword();
+	void GetSpear();
+	void GetAxe();
 	void PickupSword(ASword* SwordEquipped);
 	void PickupSpear(ASpear* SpearEquipped);
 	void PickupAxe(AAxe* AxeEquipped);
 	void PickupPotion();
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<ASword*> NearbySword;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<ASpear*> NearbySpear;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<AAxe*> NearbyAxe;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+		TArray<AHealthPotion*> Potions;
+	void SpawnDefaultSword();
+	void SpawnDefaultSpear();
+	void SpawnDefaultAxe();
 
-	
+	//Overlap
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex,
+			bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+			UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex);
 
+
+
+	// Blueprint Variables
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToSword;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToSpear;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToAxe;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool CloseToPotion;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool SwordAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool AxeAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool SpearAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HeavySwordAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HeavyAxeAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HeavySpearAttack;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HaveSword;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HaveAxe;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		bool HaveSpear;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool IsAlive;
+
+
+	//Dodge
+	float DodgeDistance;
+	float DodgeCooldown;
+	float DodgeCooldownTime;
+	FVector DodgeDirection;
+	FTimerHandle Timer;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool IsDodging;
 
 public:
 	UFUNCTION(BlueprintImplementableEvent)
@@ -189,9 +214,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
-	UFUNCTION(BlueprintCallable)
-		void SweetAlive();
 
+
+	//Widgets
 	UPROPERTY(VisibleAnywhere)
 		class UInventoryWidget* InventoryWidget = nullptr;
 	UPROPERTY(EditAnywhere)
@@ -199,22 +224,20 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 		class UPauseMenuWidget* PauseWidget = nullptr;
+
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<UPauseMenuWidget> TPauseWidget;
-	;
 
 	UPROPERTY(VisibleAnywhere)
-		class AEnemy* Enemy;
-
-
-	UPROPERTY(VisibleAnywhere)
-		class ABaseCharacter* Alive;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		ASword* SpawnSword = nullptr;
+		class UHealthBarComponent* HealthBarWidget;
 
 	UPROPERTY()
-		ASword* SwordRef;
+		TSubclassOf<UHealthBarComponent> THealthBarWidget;
+
+
+	//Weapon Ref
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+		ASword* SpawnSword = nullptr;
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class ASword> Sword;
@@ -233,51 +256,14 @@ public:
 
 	
 
-	
+	UPROPERTY(VisibleAnywhere)
+		class AEnemy* Enemy;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Attack")
-		bool SwordAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		bool AxeAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		bool SpearAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		bool HeavySwordAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		bool HeavyAxeAttack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		bool HeavySpearAttack;
-
-	
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		bool HaveSword;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		bool HaveAxe;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-		bool HaveSpear;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite)
-		bool IsDodging;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool IsAlive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		class USoundCue* SoundCue;
 
-	float DodgeDistance;
-	float DodgeCooldown;
-	float DodgeCooldownTime;
-	FVector DodgeDirection;
-	FTimerHandle Timer;
+	
 
 	float Yaw;
 	float Pitch;
@@ -300,16 +286,6 @@ protected:
 	virtual void HandleDamage(float DamageAmount) override; 
 
 private:
-
-	UPROPERTY(VisibleAnywhere)
-		class UHealthBarComponent* HealthBarWidget;
-
-	UPROPERTY()
-		TSubclassOf<UHealthBarComponent> THealthBarWidget;
-	void SpawnDefaultSword();
-	void SpawnDefaultSpear();
-	void SpawnDefaultAxe();
-
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TSubclassOf<class AWeapon> SwordClass;
 

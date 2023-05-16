@@ -343,9 +343,9 @@ void AMySweetBabyBoi::PickupAxe(AAxe* AxeEquipped)
 void AMySweetBabyBoi::GetSword()
 {
 
-	SwordRef = GetWorld()->SpawnActor<ASword>(Sword, FVector(0, 0, 0), FRotator(90, 0, 0));
-	if(SwordRef)
-	SwordRef->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Sword"));
+	SpawnSword = GetWorld()->SpawnActor<ASword>(Sword, FVector(0, 0, 0), FRotator(90, 0, 0));
+	if(SpawnSword)
+		SpawnSword->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Sword"));
 
 
 	if(SpawnSpear)
@@ -377,12 +377,12 @@ void AMySweetBabyBoi::GetSpear()
 	if (SpawnSpear)
 		SpawnSpear->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("Spear"));
 
-	if (SwordRef)
+	if (SpawnSword)
 	{
 		FDetachmentTransformRules* Detachment;
-		SwordRef->DetachFromActor(Detachment->KeepWorldTransform);
-		SwordRef->Collider->SetSimulatePhysics(true);
-		SwordRef = nullptr;
+		SpawnSword->DetachFromActor(Detachment->KeepWorldTransform);
+		SpawnSword->Collider->SetSimulatePhysics(true);
+		SpawnSword = nullptr;
 	}
 
 	if (SpawnAxe)
@@ -408,12 +408,12 @@ void AMySweetBabyBoi::GetAxe()
 		SpawnAxe->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName("Axe"));
 	
 	
-	if (SwordRef)
+	if (SpawnSword)
 	{
 		FDetachmentTransformRules* Detachment;
-		SwordRef->DetachFromActor(Detachment->KeepWorldTransform);
-		SwordRef->Collider->SetSimulatePhysics(true);
-		SwordRef = nullptr;
+		SpawnSword->DetachFromActor(Detachment->KeepWorldTransform);
+		SpawnSword->Collider->SetSimulatePhysics(true);
+		SpawnSword = nullptr;
 	}
 
 	if (SpawnSpear)
@@ -446,24 +446,6 @@ void AMySweetBabyBoi::PickupPotion()
 void AMySweetBabyBoi::SweetDeath()
 {
 	UGameplayStatics::OpenLevel(this, "DeathScreenLevel");
-}
-
-void AMySweetBabyBoi::SweetAlive()
-{
-	IsAlive = false;
-}
-
-
-
-void AMySweetBabyBoi::ResetAttack()
-{
-	SwordAttack = false;
-	AxeAttack = false;
-	SpearAttack = false;
-	HeavySwordAttack = false;
-	HeavyAxeAttack = false;
-	HeavySpearAttack = false;
-	
 }
 
 void AMySweetBabyBoi::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
