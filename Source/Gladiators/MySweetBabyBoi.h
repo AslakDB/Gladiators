@@ -31,6 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
+	virtual void Die_Implementation() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BabyVariables")
 		class USpringArmComponent* SpringArm{ nullptr };
