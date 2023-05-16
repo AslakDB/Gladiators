@@ -12,17 +12,15 @@
 #include "EnhancedInputSubsystems.h"
 #include "GameManager.h"
 #include "Components/SphereComponent.h"
-#include "BossWidget.h"
 #include "Public/Enemy/Enemy.h"
 #include "Engine/EngineTypes.h"
 #include "Sound/SoundCue.h"
-
 #include "InventoryWidget.h"
 #include "Public/Hud/PauseMenuWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Public/Hud/Health/HealthBarComponent.h"
 
-#include "PlayerUserWidget.h"
+
 #include "Blueprint/UserWidget.h"
 #include "Enemy/Enemy.h"
 #include "Items/HealthPotion.h"
