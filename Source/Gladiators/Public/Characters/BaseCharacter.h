@@ -26,10 +26,6 @@ public:
 	ABaseCharacter();
 	virtual void Tick(float DeltaTime) override;
 
-	void ChangeLevel();
-	void RemoveEnemies();
-	bool IsEnemiesLeft();
-
 protected:
 	virtual void BeginPlay() override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
@@ -37,9 +33,6 @@ protected:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void Die();
-
-	UFUNCTION(BlueprintNativeEvent)
-	void Killed();
 
 	//virtual void Die();
 	void DirectionalHitReact(const FVector& ImpactPoint);
@@ -81,9 +74,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UAttributeComponent* Attributes;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	AMyGameModeBase* GameMode;
-
 	UPROPERTY(BlueprintReadOnly)
 	TEnumAsByte<EDeathPose> DeathPose;
 
@@ -111,9 +101,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	TArray<FName> DeathMontageSections;
-
-	UPROPERTY(EditAnywhere, Category = Combat)
-	float EnemiesAlive = 3.f;
 
 public:
 	FORCEINLINE TEnumAsByte<EDeathPose> GetDeathPose() const { return DeathPose; }

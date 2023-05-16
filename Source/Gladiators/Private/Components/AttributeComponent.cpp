@@ -44,16 +44,6 @@ void UAttributeComponent::Heal()
 {
 	Health += MaxHealth * 0.5;
 }
-//void UAttributeComponent::RemoveEnemies()
-//{
-//	EnemiesAlive--;
-//	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Removed Enemies"));
-//}
-//
-//bool UAttributeComponent::IsEnemiesLeft()
-//{
-//	return EnemiesAlive > 0.f;
-//}
 
 void UAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
