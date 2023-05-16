@@ -36,17 +36,6 @@ void UAttributeComponent::AddHealthPotions(int32 NumberOfHealthPotions)
 	Health = FMath::Clamp(Health + 20, 0.f, MaxHealth);
 }
 
-//void UAttributeComponent::RemoveEnemies()
-//{
-//	EnemiesAlive--;
-//	GEngine->AddOnScreenDebugMessage(8, 8, FColor::Magenta, TEXT("Removed Enemies"));
-//}
-//
-//bool UAttributeComponent::IsEnemiesLeft()
-//{
-//	return EnemiesAlive > 0.f;
-//}
-
 void UAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
