@@ -209,9 +209,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool IsDodging;
 
+	//To be used in a blueprint
 	UFUNCTION(BlueprintImplementableEvent)
 		void TakenDamage();
-
+	//Death in bluePrint
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
 
@@ -230,10 +231,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 		class UHealthBarComponent* HealthBarWidget;
-
-	UPROPERTY()
-		TSubclassOf<UHealthBarComponent> THealthBarWidget;
-
 
 	//Weapon Ref
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
