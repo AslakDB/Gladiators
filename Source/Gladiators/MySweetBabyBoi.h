@@ -28,6 +28,7 @@ public:
 	AMySweetBabyBoi();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UFUNCTION(BlueprintCallable)
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit_Implementation(const FVector& ImpactPoint, AActor* ActorHit) override;
 
@@ -48,7 +49,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputMappingContext* MappingContext;
@@ -76,6 +78,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
 		class UInputAction* UseInput;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = input)
+		class UInputAction* HealInput;
 
 	/*This opens and closes inventory*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
@@ -85,9 +89,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputAction* PauseGame;
 
-	/*TEST*/
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	class UInputAction* FKeyAction;
 
 	UPROPERTY(EditAnywhere, Category = Input)
 	class UInputAction* AttackAction;
@@ -165,9 +166,12 @@ private:
 	void OpenInv(const FInputActionValue& input);
 	void CloseInv(const FInputActionValue& input);
 	void PausedGame(const FInputActionValue& input);
+	void HealPlayer(const FInputActionValue& input);
 
 	void DodgeReset();
 	void Movement();
+	
+
 	void PickupSword(ASword* SwordEquipped);
 	void PickupSpear(ASpear* SpearEquipped);
 	void PickupAxe(AAxe* AxeEquipped);
@@ -179,7 +183,9 @@ private:
 
 
 public:
-		
+	UFUNCTION(BlueprintImplementableEvent)
+		void TakenDamage();
+
 	UFUNCTION(BlueprintCallable)
 		void SweetDeath();
 	UFUNCTION(BlueprintCallable)
@@ -263,6 +269,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool IsAlive;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class USoundCue* SoundCue;
 
 	float DodgeDistance;
 	float DodgeCooldown;
