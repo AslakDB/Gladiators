@@ -222,7 +222,7 @@ void AMySweetBabyBoi::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 float AMySweetBabyBoi::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Health -= DamageAmount;
-	
+	TakenDamage();
 	HandleDamage(DamageAmount);
 	return DamageAmount;
 	
