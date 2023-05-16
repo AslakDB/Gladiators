@@ -7,7 +7,6 @@
 #include "Components/AttributeComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Gladiators/MySweetBabyBoi.h"
-#include "Gamemode/MyGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 
 ABaseCharacter::ABaseCharacter()
