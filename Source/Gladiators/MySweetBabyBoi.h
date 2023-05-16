@@ -49,7 +49,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 		class UInputMappingContext* MappingContext;
@@ -271,6 +272,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool IsAlive;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class USoundCue* SoundCue;
 
 	float DodgeDistance;
 	float DodgeCooldown;
