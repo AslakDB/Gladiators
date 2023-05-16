@@ -15,7 +15,6 @@
 #include "Items/Weapons/Sword.h"
 #include "Items/HealthPotion.h"
 #include "EngineUtils.h"
-#include "Hud/EnemyHealthBar.h"
 #include "Components/WidgetComponent.h"
 #include "Hud/Health/HealthBarComponent.h"
 #include "Kismet/GameplayStatics.h"
